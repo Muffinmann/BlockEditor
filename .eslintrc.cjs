@@ -22,6 +22,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    "indent": ["error", 2],
     '@typescript-eslint/no-non-null-assertion': 'off',
   },
 }
