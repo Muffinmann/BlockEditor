@@ -1,5 +1,6 @@
 .popup {
   position: absolute;
+  top: 100%;
   /* Adjust as needed */
   width: 300px;
   /* Adjust width as needed */

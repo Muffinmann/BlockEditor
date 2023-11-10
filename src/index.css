@@ -2,9 +2,31 @@
   box-sizing: border-box;
 }
 
+li,
+ul li {
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  list-style-type: none;
+}
+
+ul {
+  display: block;
+  list-style-type: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
 body {
   font-family: 'Courier New', monospace;
   background-color: #f0f0f0;
   color: #333;
   padding: 20px;
+}
+
+.hidden {
+  display: none;
 }

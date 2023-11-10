@@ -1,0 +1,10 @@
+[
+  {
+    "type": "Category",
+    "slots": 1
+  },
+  {
+    "type": "If",
+    "slots": 3
+  }
+]

@@ -1,21 +1,27 @@
+import { useRef } from "react";
 import "./PopupSelect.css"
+import AVAILABLE_BLOCKS from '../config/blockDefinitions.json';
 
+const PopupSelect = ({ onClick}: {onClick: (type: string) => void}) => {
+  const popupRef = useRef<HTMLDivElement | null>(null)
 
-const PopupSelect = () => {
   return ( 
-    <div className="popup" id="popup">
+    <div
+      className="popup" id="popup" ref={popupRef}
+    >
       <div className="popup-header">
-        <input type="text" placeholder="Type to search..." id="searchInput" />
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Type to search..."
+        />
       </div>
 
-      <div className="popup-list">
-        <div className="list-item">Block 1</div>
-        <div className="list-item">Block 2</div>
-        <div className="list-item">Block 3</div>
-        <div className="list-item">Block 4</div>
-        <div className="list-item">Block 5</div>
-        <div className="list-item">Block 6</div>
-      </div>
+      <ul id="block-types" className="popup-list">
+        {AVAILABLE_BLOCKS.map((opt) => (
+          <li className="list-item" key={opt.type} onClick={() => onClick(opt.type)} >{opt.type}</li>
+        ))}
+      </ul>
     </div>
   )
 

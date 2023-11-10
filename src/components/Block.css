@@ -28,6 +28,7 @@
 }
 
 .block-footer {
+  position: relative;
   display: flex;
   justify-content: end;
 }
