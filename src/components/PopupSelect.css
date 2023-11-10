@@ -1,0 +1,41 @@
+.popup {
+  position: absolute;
+  /* Adjust as needed */
+  width: 300px;
+  /* Adjust width as needed */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 1000;
+  /* To ensure it appears above other content */
+}
+
+.popup-header {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.popup-header input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.popup-list {
+  max-height: 240px;
+  /* Height for 6 items, adjust based on your item height */
+  overflow-y: auto;
+  /* Enables scrolling */
+}
+
+.list-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.list-item:hover {
+  background-color: #f4f4f4;
+}

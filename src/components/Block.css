@@ -1,0 +1,60 @@
+.block {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.block.hovered {
+  background-color: #f7f7f7;
+  /* Slightly different background color on hover */
+}
+
+.block-header {
+  font-size: 16px;
+  color: #2a9d8f;
+  margin-bottom: 15px;
+  font-family: 'Courier New', monospace;
+}
+
+.block-content {
+  min-height: 50px;
+  /* Additional styling for block content */
+  padding-left: 20px;
+  font-family: 'Courier New', monospace;
+}
+
+.block-footer {
+  display: flex;
+  justify-content: end;
+}
+
+.nested-block {
+  margin-top: 10px;
+  /* Further indentation for nested blocks */
+  padding-left: 20px;
+  /* Optional: visual cue for nesting */
+  padding-left: 15px;
+}
+
+
+.add-btn,
+.remove-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin-left: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #e76f51;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover,
+.remove-btn:hover {
+  background-color: #2a9d8f;
+}
