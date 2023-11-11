@@ -1,0 +1,11 @@
+.evaluation-block>.block-header {
+  color: #ffa500;
+}
+
+.truthy-block>.block-header {
+  color: #008000;
+}
+
+.falsy-block>.block-header {
+  color: #ff0000;
+}
