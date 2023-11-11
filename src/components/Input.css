@@ -1,0 +1,8 @@
+.input-field {
+  padding: 8px;
+  font-family: 'Courier New', monospace;
+  /* Monospaced font for the code editor look */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}

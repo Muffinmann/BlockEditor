@@ -1,0 +1,7 @@
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 5px auto;
+  /* Space between input fields */
+}
