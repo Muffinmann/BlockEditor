@@ -2,10 +2,17 @@ import { MouseEventHandler, ReactElement, useId, useRef, useState } from "react"
 import './Block.css';
 import PopupSelect from "./PopupSelect";
 
-
+interface BlockProps {
+  name: string, // display name
+  type?: string, // block type: "if", "var", ...
+  disableAdd?: boolean,
+  disableRemove?: boolean,
+  children: ReactElement | ReactElement[]
+  className?: string, // supplement class names
+}
 // This block serves as a general interface for the system and offers the basic
 // functionality for building blocks.
-const Block = ({name, children}: {name: string, children?: ReactElement | ReactElement[]}) => {
+const Block = ({className = '', name, disableAdd, disableRemove, children}: BlockProps) => {
   const blockId = useId()
   const blockRef = useRef(null)
   const [hovered, setHovered] = useState(false);
@@ -28,7 +35,7 @@ const Block = ({name, children}: {name: string, children?: ReactElement | ReactE
     <div
       ref={blockRef}
       id={blockId}
-      className={`block ${hovered ? 'hovered' : ''}`}
+      className={`block ${className} ${hovered ? 'hovered' : ''}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >
@@ -37,13 +44,13 @@ const Block = ({name, children}: {name: string, children?: ReactElement | ReactE
         {children}
       </div>
       <div className={`block-footer ${hovered ? '' : 'hidden'}`}>
-        <button
+        {!disableAdd && (<button
           name="addButton"
           className="add-btn"
           onClick={() => {setShowPopup(true)}}
         >
             +
-        </button>
+        </button>)}
         <button className="remove-btn">-</button>
         { showPopup && <PopupSelect />}
       </div>

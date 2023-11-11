@@ -1,10 +1,30 @@
 [
   {
     "type": "Category",
-    "slots": 1
+    "blockHeader": "$userInput",
+    "slots": 1,
+    "slotType": [
+      "Block"
+    ]
   },
   {
     "type": "If",
-    "slots": 3
+    "blockHeader": "If",
+    "slots": 3,
+    "slotType": [
+      "Block",
+      "Input"
+    ]
+  },
+  {
+    "type": "Var",
+    "blockHeader": "Variable",
+    "slots": 1,
+    "slotType": [
+      "Input"
+    ],
+    "disableButton": [
+      "add"
+    ]
   }
 ]
