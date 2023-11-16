@@ -1,18 +1,22 @@
 import { MouseEventHandler, ReactElement, useId, useRef, useState } from "react";
 import './Block.css';
 import PopupSelect from "./PopupSelect";
+import { useBlockRenderContext } from "../hooks/useBlockDispatcher";
+import { BasicBlockProps } from "./BasicBlock";
 
-interface BlockProps {
-  name: string, // display name
+
+interface BlockProps extends BasicBlockProps {
+  name?: string, // display name
   type?: string, // block type: "if", "var", ...
   disableAdd?: boolean,
   disableRemove?: boolean,
-  children: ReactElement | ReactElement[]
   className?: string, // supplement class names
+  path: string, // dot seperated path in the tree
+  children: ReactElement | ReactElement[]
 }
 // This block serves as a general interface for the system and offers the basic
 // functionality for building blocks.
-const Block = ({className = '', name, disableAdd, disableRemove, children}: BlockProps) => {
+const Block = ({ className = '', name, disableAdd, disableRemove, path, children }: BlockProps) => {
   const blockId = useId()
   const blockRef = useRef(null)
   const [hovered, setHovered] = useState(false);
@@ -31,6 +35,22 @@ const Block = ({className = '', name, disableAdd, disableRemove, children}: Bloc
     }
   };
 
+  const dispatch = useBlockRenderContext()
+
+  const handleRemove = () => {
+    dispatch((old) => {
+      const nodes = path.split('.').slice(1)
+      let target = old
+      while (nodes.length > 1) {
+        const nextPath = nodes.shift()
+        target = target[nextPath]
+      }
+      const lastKey = nodes.shift()
+      delete target[lastKey]
+      return { ...old }
+    })
+  }
+
   return (
     <div
       ref={blockRef}
@@ -47,12 +67,12 @@ const Block = ({className = '', name, disableAdd, disableRemove, children}: Bloc
         {!disableAdd && (<button
           name="addButton"
           className="add-btn"
-          onClick={() => {setShowPopup(true)}}
+          onClick={() => { setShowPopup(true) }}
         >
-            +
+          +
         </button>)}
-        <button className="remove-btn">-</button>
-        { showPopup && <PopupSelect />}
+        <button className="remove-btn" onClick={handleRemove}>-</button>
+        {showPopup && <PopupSelect />}
       </div>
     </div>
   )
