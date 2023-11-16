@@ -1,9 +1,7 @@
 import { ComponentProps } from 'react';
 import './Input.css'
 
-interface Input extends ComponentProps<'input'> {
-
-}
+type Input = ComponentProps<'input'>
 const Input = ({ type = 'text', value, ...props }: Input) => {
   return (
     <input

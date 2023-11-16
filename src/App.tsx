@@ -1,27 +1,13 @@
-import { createContext, useContext, useReducer, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Block from './components/Block'
-import PopupSelect from './components/PopupSelect'
-import InputGroup from './components/InputGroup'
+import { useReducer } from 'react'
 import IfBlock from './components/IfBlock'
 import VarBlock from './components/VarBlock'
+import CategoryBlock from './components/CategoryBlock'
+import InputBlock from './components/InputBlock'
 import StrictEqualBlock from './components/StrictEqualBlock'
-import Input from './components/Input'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
+import { BlockNode } from './types'
+import './App.css'
 
-type BlockNode = {
-  type: 'Category',
-  name: string,
-  children: BlockNode[]
-} | {
-  type: 'If' | 'StrictEqual',
-  children: BlockNode[],
-} | {
-  type: 'Var',
-  value: string,
-} | string
 
 const testTree: BlockNode = {
   type: 'Category',
@@ -50,15 +36,17 @@ const testTree: BlockNode = {
 const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: string }) => {
   console.log(node)
   if (!node) return null;
-  if (typeof node === 'string') return node
+  if (typeof node === 'string') {
+    return <InputBlock path={path} value={node} />
+  } 
   if (node.type === 'Category') {
     return (
-      <Block
+      <CategoryBlock
         name={node.name}
         path={path}
       >
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
-      </Block>
+      </CategoryBlock>
     )
   }
   if (node.type === 'If') {
@@ -78,10 +66,10 @@ const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: string 
   }
   if (node.type === 'StrictEqual') {
     return (
-      <StrictEqualBlock
-        left={<BlockRenderer path={`${path}.children.0`} node={node.children[0]} />}
-        right={<BlockRenderer path={`${path}.children.0`} node={node.children[1]} />}
-      />
+      <StrictEqualBlock path={path} >
+        <BlockRenderer path={`${path}.children.0`} node={node.children[0]} />
+        <BlockRenderer path={`${path}.children.1`} node={node.children[1]} />
+      </StrictEqualBlock>
     )
   }
 }

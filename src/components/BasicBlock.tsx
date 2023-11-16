@@ -1,5 +1,7 @@
 import { useId, useRef, useState, MouseEventHandler, ReactElement } from "react";
 import PopupSelect from "./PopupSelect";
+import { BlockElement } from "../types";
+import "./BasicBlock.css"
 
 export interface BasicBlockProps {
   displayName?: string,
@@ -9,7 +11,7 @@ export interface BasicBlockProps {
   className?: string, // supplement class names
   onAdd?: (blockType: string) => void;
   onRemove?: () => void;
-  children: ReactElement | ReactElement[]
+  children: BlockElement;
 }
 
 const BasicBlock = ({
