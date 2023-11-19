@@ -34,7 +34,6 @@ const CategoryHeader = ({name, onNameChange}: {name: string, onNameChange: (name
         value={name} 
         onChange={handleChange} 
         onBlur={() => setEditingName(false)} 
-        placeholder="Enter name here"
       />
     )
   }
