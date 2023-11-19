@@ -1,21 +1,68 @@
+import { ChangeEvent, useState } from "react";
+import { FiMaximize2, FiMinimize2  } from "react-icons/fi";import {} from 'react-icons/hi';
 import { BlockElement } from "../types";
 import BasicBlock from "./BasicBlock";
 
-const CategoryBlock = ({children, name, path}: {
-  children: BlockElement,
-  name: string,
-  path: string,
-}) => {
-  const handleAdd = (type: string) => {
-    console.log("Adding ", type, " to ", path)
+
+const CategoryHeader = ({name, onNameChange}: {name: string, onNameChange: (name: string) => void}) => {
+  const [editingName, setEditingName] = useState(false)
+  const handleClick = () => {
+    setEditingName(true)
   }
-  const handleRemove = () => {
-    console.log("Removing ", path)
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    onNameChange(value)
+  }
+
+  if (editingName || !name) {
+    return (
+      <input
+        className="block-header block-header__input" 
+        value={name} 
+        onChange={handleChange} 
+        onBlur={() => setEditingName(false)} 
+        placeholder="Enter name here"
+      />
+    )
   }
   return (
-    <BasicBlock displayName={name} onAdd={handleAdd} onRemove={handleRemove}>
-      {children}
-    </BasicBlock>
+    <button onClick={handleClick} className="block-header block-header__button">{name}</button>
+  )
+}
+
+const CategoryBlock = ({
+  children, 
+  displayName,
+  onAdd,
+  onRemove,
+  onNameChange,
+}: {
+  children: BlockElement,
+  displayName: string,
+  onAdd: (type: string) => void,
+  onRemove: () => void,
+  onNameChange: (name: string) => void,
+}) => {
+  const [expanded,setExpanded] = useState(false)
+  if (!expanded) {
+    return (
+      <div>
+        <button type="button" onClick={() => {setExpanded(true)}}>
+          <FiMaximize2 />
+        </button>
+        <BasicBlock displayName={displayName} disableAdd disableRemove >...</BasicBlock>
+      </div>
+    )
+  }
+  return (
+    <div>
+      <button type="button" onClick={() => {setExpanded(false)}}>
+        <FiMinimize2 />
+      </button>
+      <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} onAdd={onAdd} onRemove={onRemove}>
+        {children}
+      </BasicBlock>
+    </div>
   )
 };
 export default CategoryBlock;
