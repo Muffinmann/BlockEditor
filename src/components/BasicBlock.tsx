@@ -1,10 +1,10 @@
-import { useId, useRef, useState, MouseEventHandler, ReactElement } from "react";
+import { useId, useRef, useState, MouseEventHandler } from "react";
 import PopupSelect from "./PopupSelect";
 import { BlockElement } from "../types";
 import "./BasicBlock.css"
 
 export interface BasicBlockProps {
-  displayName?: string,
+  displayName?: string | JSX.Element,
   type?: string, // block type: "if", "var", ...
   disableAdd?: boolean,
   disableRemove?: boolean,

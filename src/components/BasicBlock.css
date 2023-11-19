@@ -20,6 +20,13 @@
   font-family: 'Courier New', monospace;
 }
 
+.block-header__button {
+  outline: none;
+  border: none;
+  background: transparent;
+  margin: 0 0;
+}
+
 .block-content {
   min-height: 50px;
   /* Additional styling for block content */
