@@ -1,6 +1,30 @@
 import { createContext, useState, useContext, PropsWithChildren, Dispatch } from "react";
+import { BlockNode } from "../types";
 
-const BlockUpdateDispatcherContext = createContext<Dispatch<unknown>>(() => { })
+type BlockUpdateAction = {
+  type: 'remove',
+  payload: string,
+} | {
+  type: 'add',
+  payload: {
+    path: string,
+    blockType: string,
+  }
+} | {
+  type: 'updateValue',
+  payload: {
+    path: string,
+    nextValue: string,
+  }
+} | {
+  type: 'updateNode',
+  payload: {
+    path: string,
+    callback: (n: BlockNode) => BlockNode
+  }
+}
+
+const BlockUpdateDispatcherContext = createContext<Dispatch<BlockUpdateAction>>(() => { })
 
 export const BlockDispatcherProvider = ({ children, dispatch }: PropsWithChildren<{ dispatch: ReturnType<typeof useState>['1'] }>) => {
   return (
