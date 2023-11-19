@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { FiMaximize2, FiMinimize2  } from "react-icons/fi";import {} from 'react-icons/hi';
-import { BlockElement } from "../types";
+import { BlockElement, BlockType } from "../types";
 import BasicBlock from "./BasicBlock";
 
 
@@ -14,7 +14,20 @@ const CategoryHeader = ({name, onNameChange}: {name: string, onNameChange: (name
     onNameChange(value)
   }
 
-  if (editingName || !name) {
+  if (!name) {
+    return (
+      <input
+        className="block-header block-header__input" 
+        onBlur={(e) => {
+          setEditingName(false)
+          handleChange(e)
+        }} 
+        placeholder="Enter name here"
+      />
+    )
+  }
+
+  if (editingName) {
     return (
       <input
         className="block-header block-header__input" 
@@ -39,7 +52,7 @@ const CategoryBlock = ({
 }: {
   children: BlockElement,
   displayName: string,
-  onAdd: (type: string) => void,
+  onAdd: (type: BlockType) => void,
   onRemove: () => void,
   onNameChange: (name: string) => void,
 }) => {
@@ -50,7 +63,7 @@ const CategoryBlock = ({
         <button type="button" onClick={() => {setExpanded(true)}}>
           <FiMaximize2 />
         </button>
-        <BasicBlock displayName={displayName} disableAdd disableRemove >...</BasicBlock>
+        <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} disableAdd disableRemove >...</BasicBlock>
       </div>
     )
   }

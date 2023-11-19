@@ -1,8 +1,9 @@
 import { useRef } from "react";
 import "./PopupSelect.css"
 import AVAILABLE_BLOCKS from '../config/blockDefinitions.json';
+import { BlockType } from "../types";
 
-const PopupSelect = ({ onClick}: {onClick: (type: string) => void}) => {
+const PopupSelect = ({ onClick}: {onClick: (type: BlockType) => void}) => {
   const popupRef = useRef<HTMLDivElement | null>(null)
 
   return ( 
@@ -19,7 +20,7 @@ const PopupSelect = ({ onClick}: {onClick: (type: string) => void}) => {
 
       <ul id="block-types" className="popup-list">
         {AVAILABLE_BLOCKS.map((opt) => (
-          <li className="list-item" key={opt.type} onClick={() => onClick(opt.type)} >{opt.type}</li>
+          <li className="list-item" key={opt.type} onClick={() => onClick(opt.type as BlockType)} >{opt.type}</li>
         ))}
       </ul>
     </div>

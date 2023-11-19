@@ -1,10 +1,8 @@
-import { ChangeEvent, useReducer } from 'react'
-import { BlockDispatcherProvider, useBlockDispatcher } from './hooks/useBlockDispatcher'
-import { BlockNode } from './types'
+import { useReducer } from 'react'
+import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
+import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
-import BasicBlock from './components/BasicBlock'
-import Input from './components/Input'
-import CategoryBlock from './components/CategoryBlock'
+import BlockRenderer from './components/BlockRenderer'
 
 
 const testTree: BlockNode = {
@@ -31,120 +29,9 @@ const testTree: BlockNode = {
   ]
 }
 
-const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: string }) => {
-  const dispatch = useBlockDispatcher()
-  const handleAdd = (type: string) => {
-    dispatch({
-      type: 'add',
-      payload: {
-        path,
-        blockType: type
-      }
-    })
-  }
-  const handleRemove = () => {
-    dispatch({
-      type: 'remove',
-      payload: path,
-    })
-  }
-  const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    dispatch({
-      type: 'updateValue',
-      payload: {
-        path,
-        nextValue:value
-      }
-    })
-  }
 
-  const handleNameChange = (name: string) => {
-    dispatch({
-      type: 'updateNode',
-      payload: {
-        path,
-        callback:(node) => {
-          console.log("update node", node)
-          if (typeof node === 'object' && ('name' in node)) {
-            return {
-              ...node,
-              name
-            }
-          }
-        }
-      }
-    })
-  }
-  if (!node) return null;
-  if (typeof node === 'string') {
-    // return <InputBlock path={path} value={node} />
-    return (
-      <BasicBlock displayName="Text" disableAdd onRemove={handleRemove}>
-        <Input value={node} onChange={handleValueChange} />
-      </BasicBlock>)
-  } 
-  if (node.type === 'Category') {
-    return (
-      <CategoryBlock displayName={node.name} onAdd={handleAdd} onRemove={handleRemove} onNameChange={handleNameChange}>
-        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
-      </CategoryBlock>
-    )
-  }
-  if (node.type === 'If') {
-    return (
-      <BasicBlock onRemove={handleRemove} displayName="If" >
-        <BasicBlock disableAdd={Boolean(node.children[0])} onAdd={handleAdd} disableRemove displayName="Evaluation" className="evaluation-block">
-          <BlockRenderer path={`${path}.children.0`} node={node.children[0]} />
-        </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[1])} onAdd={handleAdd} disableRemove displayName="Truthy" className="truthy-block">
-          <BlockRenderer path={`${path}.children.1`} node={node.children[1]} />
-        </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[2])} onAdd={handleAdd} disableRemove displayName="Falsy" className="falsy-block">
-          <BlockRenderer path={`${path}.children.2`} node={node.children[2]} />
-        </BasicBlock>
-      </BasicBlock>
-    )
-  }
-  if (node.type === "Var") {
-    return (
-      <BasicBlock disableAdd displayName="Variable" onRemove={handleRemove} >
-        <Input value={node.value} onChange={handleValueChange} />
-      </BasicBlock>
-    )
-  }
-  if (node.type === 'StrictEqual') {
-    return (
-      <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} >
-        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
-      </BasicBlock>
-    )
-  }
-}
 
-type BlockUpdateAction = {
-  type: 'remove',
-  payload: string,
-} | {
-  type: 'add',
-  payload: {
-    path: string,
-    blockType: string,
-  }
-} | {
-  type: 'updateValue',
-  payload: {
-    path: string,
-    nextValue: string,
-  }
-} | {
-  type: 'updateNode',
-  payload: {
-    path: string,
-    callback: (n: BlockNode) => BlockNode
-  }
-}
-const recursiveUpdate = (obj: BlockNode, path: string[], onReachTarget: (t: BlockNode) => BlockNode): BlockNode | BlockNode[] | BlockNode[keyof BlockNode] => {
+const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTarget: (t: BlockNode | BlockNode[]) => BlockNode | BlockNode[] | null): null | BlockNode | BlockNode[] | BlockNode[keyof BlockNode] => {
   if (!path) {
     console.error("Expected 'path' argument to be type 'string[]', got 'undefined'.")
     return obj;
@@ -165,16 +52,29 @@ const recursiveUpdate = (obj: BlockNode, path: string[], onReachTarget: (t: Bloc
     return recursiveUpdate(obj, path, onReachTarget)
   }
 
+  if (typeof obj === 'string') {
+    return obj;
+  }
+
   if (Array.isArray(obj)) {
     // If obj is an array, update it without converting to an object
-    const updatedArray = [...obj] as BlockNode[]; 
-    updatedArray[currentSeg] = recursiveUpdate(obj[currentSeg], path, onReachTarget);
-    return updatedArray.filter(Boolean);
-  } else {
-    // If obj is not an array, proceed as before
-    obj[currentSeg] = recursiveUpdate(obj[currentSeg], path, onReachTarget);
-    return Object.assign({}, obj);
-  }
+    const updatedArray = obj.map((o, index) => {
+      const i = parseInt(currentSeg, 10)
+      if (index === i) {
+        return recursiveUpdate(obj[i], path, onReachTarget)
+      }
+      return o 
+    }) 
+
+    return updatedArray.filter(Boolean) as BlockNode[];
+  } 
+
+
+  return {
+    ...obj,
+    [currentSeg]: recursiveUpdate(obj[currentSeg as keyof BlockNode], path, onReachTarget)
+  } as BlockNode;
+  
 }
 
 const updateBlockNode = (obj: BlockNode, path: string[], value: string) => {
@@ -190,24 +90,36 @@ const updateBlockNode = (obj: BlockNode, path: string[], value: string) => {
         }
       }
     }
-  })
+    return obj
+  }) as BlockNode
 }
 const removeBlockNode = (obj: BlockNode, path: string[]) => {
-  return recursiveUpdate(obj, path, () => null)
+  return recursiveUpdate(obj, path, () => null) as BlockNode
 }
-const createBlockNode = (type: string) => {
-  if (type === "Var") {
+
+const createBlockNode = (type: BlockType): BlockNode => {
+  switch(type) {
+  case 'Var':
     return {
       type,
       value: ""
     }
-  }
-  return {
-    type,
-    children: []
+  case 'Category':
+    return {
+      name: '',
+      type,
+      children: []
+    }
+  case 'If':
+  case 'StrictEqual':
+  default:
+    return {
+      type,
+      children: []
+    }
   }
 }
-const addBlockNode = (obj: BlockNode, path: string[], newBlockType: string) => {
+const addBlockNode = (obj: BlockNode, path: string[], newBlockType: BlockType) => {
   return recursiveUpdate(obj, path, (obj) => {
     if (typeof obj === 'object' && 'children' in obj) {
       return {
@@ -215,8 +127,10 @@ const addBlockNode = (obj: BlockNode, path: string[], newBlockType: string) => {
         children: [...obj.children, createBlockNode(newBlockType)]
       }
     }
-  })
+    return obj
+  }) as BlockNode
 }
+
 const reducer = (state: BlockNode, action: BlockUpdateAction) => {
   console.count("running reducer")
   if (action.type === 'remove') {
@@ -229,7 +143,7 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
     return updateBlockNode(state, action.payload.path.split('.'), action.payload.nextValue)
   }
   if (action.type === 'updateNode') {
-    return recursiveUpdate(state, action.payload.path.split('.'), action.payload.callback)
+    return recursiveUpdate(state, action.payload.path.split('.'), action.payload.callback) as BlockNode
   }
   return state
 }

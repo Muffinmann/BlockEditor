@@ -1,32 +1,10 @@
-import { createContext, useState, useContext, PropsWithChildren, Dispatch } from "react";
-import { BlockNode } from "../types";
+import { createContext, useContext, PropsWithChildren, Dispatch } from "react";
+import { BlockUpdateAction } from "../types";
 
-type BlockUpdateAction = {
-  type: 'remove',
-  payload: string,
-} | {
-  type: 'add',
-  payload: {
-    path: string,
-    blockType: string,
-  }
-} | {
-  type: 'updateValue',
-  payload: {
-    path: string,
-    nextValue: string,
-  }
-} | {
-  type: 'updateNode',
-  payload: {
-    path: string,
-    callback: (n: BlockNode) => BlockNode
-  }
-}
 
-const BlockUpdateDispatcherContext = createContext<Dispatch<BlockUpdateAction>>(() => { })
+const BlockUpdateDispatcherContext = createContext<Dispatch<BlockUpdateAction>>(() => {console.log("Default block dispatcher is not implemented.")})
 
-export const BlockDispatcherProvider = ({ children, dispatch }: PropsWithChildren<{ dispatch: ReturnType<typeof useState>['1'] }>) => {
+export const BlockDispatcherProvider = ({ children, dispatch }: PropsWithChildren<{ dispatch: Dispatch<BlockUpdateAction> }>) => {
   return (
     <BlockUpdateDispatcherContext.Provider value={dispatch}>
       {children}

@@ -1,6 +1,6 @@
 import { useId, useRef, useState, MouseEventHandler } from "react";
 import PopupSelect from "./PopupSelect";
-import { BlockElement } from "../types";
+import { BlockElement, BlockType } from "../types";
 import "./BasicBlock.css"
 
 export interface BasicBlockProps {
@@ -9,7 +9,7 @@ export interface BasicBlockProps {
   disableAdd?: boolean,
   disableRemove?: boolean,
   className?: string, // supplement class names
-  onAdd?: (blockType: string) => void;
+  onAdd?: (blockType: BlockType) => void;
   onRemove?: () => void;
   children: BlockElement;
 }
