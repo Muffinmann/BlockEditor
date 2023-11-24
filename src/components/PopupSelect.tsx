@@ -6,6 +6,7 @@ import { BlockType } from "../types";
 const PopupSelect = ({ onClick}: {onClick: (type: BlockType) => void}) => {
   const popupRef = useRef<HTMLDivElement | null>(null)
 
+  // TODO: translate back to screen if it is out
   return ( 
     <div
       className="popup" id="popup" ref={popupRef}
