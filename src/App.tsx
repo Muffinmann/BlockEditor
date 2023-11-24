@@ -166,7 +166,12 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
 
     const updated = recursiveUpdate(state, action.payload.to.split('.'), (toNode) => {
       if (typeof toNode === 'object' && 'children' in toNode) {
-        toNode.children.push(source)
+        const childrenHasEmptySlot = toNode.children.findIndex((child) => child === undefined || child === null) > -1
+        if (childrenHasEmptySlot) {
+          toNode.children = toNode.children.map((child) => (child === undefined || child === null) ? source : child)
+        } else {
+          toNode.children.push(source)
+        }
         return toNode
       }
       destination = toNode as BlockNode

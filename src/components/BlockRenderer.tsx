@@ -84,15 +84,11 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   if (node.type === 'If') {
     return (
       <BasicBlock onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
-        <BasicBlock disableAdd={Boolean(node.children[0])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[0])} displayName="Evaluation" className="evaluation-block">
-          <BlockRenderer path={`${path}.children.0`} node={node.children[0]} />
-        </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[1])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[1])} displayName="Truthy" className="truthy-block">
-          <BlockRenderer path={`${path}.children.1`} node={node.children[1]} />
-        </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[2])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[2])} displayName="Falsy" className="falsy-block">
-          <BlockRenderer path={`${path}.children.2`} node={node.children[2]} />
-        </BasicBlock>
+        {node.children.slice(0, 3).map((child, i) => (
+          <BasicBlock key={i} disableAdd disableRemove disableDrag allowDragPropagation displayName={i === 0 ? "Evaluation" : i === 1 ? "Truthy" : "Falsy"} className={i === 0 ? "evaluation-block" : i === 1 ? "truthy-block" : "falsy-block"}>
+            <BlockRenderer node={child} path={`${path}.children.${i}`} />
+          </BasicBlock>
+        ))}
       </BasicBlock>
     )
   }
