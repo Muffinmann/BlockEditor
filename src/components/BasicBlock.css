@@ -89,4 +89,5 @@
 .block.truthy-block,
 .block.falsy-block {
   box-shadow: none;
+  background-color: transparent;
 }
