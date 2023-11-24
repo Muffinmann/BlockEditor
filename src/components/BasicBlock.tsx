@@ -1,4 +1,4 @@
-import { useId, useRef, useState, MouseEventHandler } from "react";
+import { useId, useRef, useState, MouseEventHandler, DragEventHandler } from "react";
 import PopupSelect from "./PopupSelect";
 import { BlockElement, BlockType } from "../types";
 import "./BasicBlock.css"
@@ -8,9 +8,18 @@ export interface BasicBlockProps {
   type?: string, // block type: "if", "var", ...
   disableAdd?: boolean,
   disableRemove?: boolean,
+  disableDrag?: boolean,
+  allowDragPropagation?: boolean,
   className?: string, // supplement class names
   onAdd?: (blockType: BlockType) => void;
   onRemove?: () => void;
+  onDrag?: DragEventHandler<HTMLDivElement>,
+  onDragStart?:DragEventHandler<HTMLDivElement>,
+  onDragEnter?:DragEventHandler<HTMLDivElement>,
+  onDragOver?:DragEventHandler<HTMLDivElement>,
+  onDragLeave?:DragEventHandler<HTMLDivElement>,
+  onDragEnd?:DragEventHandler<HTMLDivElement>,
+  onDrop?:DragEventHandler<HTMLDivElement>,
   children: BlockElement;
 }
 
@@ -19,8 +28,17 @@ const BasicBlock = ({
   displayName,
   disableAdd,
   disableRemove,
+  disableDrag = false,
+  allowDragPropagation = false,
   onAdd,
   onRemove,
+  onDrag,
+  onDragStart,
+  onDragEnter,
+  onDragOver,
+  onDragLeave,
+  onDragEnd,
+  onDrop,
   children }: BasicBlockProps) => {
   const blockId = useId()
   const blockRef = useRef(null)
@@ -39,14 +57,68 @@ const BasicBlock = ({
       setShowPopup(false)
     }
   };
+  
+  const handleDrag:DragEventHandler<HTMLDivElement> = (e) => {
+    !allowDragPropagation && e.stopPropagation()
+    if (onDrag) {
+      onDrag(e)
+    }
+  }
+  const handleDragStart:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    if (onDragStart) {
+      onDragStart(ev)
+    }
+  }
+  const handleDragEnter:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    if (onDragEnter) {
+      onDragEnter(ev)
+    }
+  }
+  const handleDragOver:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    ev.preventDefault() 
+    ev.dataTransfer.dropEffect = "move";
+    if (onDragOver) {
+      onDragOver(ev)
+    }
+  }
+  const handleDragLeave:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    if (onDragLeave) {
+      onDragLeave(ev)
+    }
+  }
+  const handleDragEnd:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    if (onDragEnd){
+      onDragEnd(ev)
+    }
+  }
+  const handleDrop:DragEventHandler<HTMLDivElement> = (ev) => {
+    !allowDragPropagation && ev.stopPropagation()
+    ev.preventDefault() 
+    if (onDrop) {
+      onDrop(ev)
+    }
+  }
 
   return (
     <div
+      draggable={!disableDrag}
       ref={blockRef}
       id={blockId}
       className={`block ${className} ${hovered ? 'hovered' : ''}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
+      onDrag={handleDrag}
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDragEnd={handleDragEnd}
+      onDrop={handleDrop} 
     >
       <div className="block-header">{displayName}</div>
       <div className="block-content">
