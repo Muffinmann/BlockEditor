@@ -44,7 +44,7 @@ const BasicBlock = ({
   onDrop,
   children }: BasicBlockProps) => {
   const blockId = useId()
-  const blockRef = useRef(null)
+  const blockRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [isDropTarget, setIsDropTarget] = useState(false);
@@ -71,7 +71,9 @@ const BasicBlock = ({
   }
   const handleDragStart:DragEventHandler<HTMLDivElement> = (ev) => {
     !allowDragPropagation && ev.stopPropagation()
-    ev.dataTransfer.setDragImage(blockRef.current!, 10, 10)
+    if (blockRef.current) {
+      ev.dataTransfer.setDragImage(blockRef.current, 10, 10)
+    }
     if (onDragStart) {
       onDragStart(ev)
     }
