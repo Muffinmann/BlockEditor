@@ -57,6 +57,9 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   }
   const handleDrop: DragEventHandler<HTMLDivElement>=(ev) => {
     const fromPath = ev.dataTransfer.getData('text/plain')
+    if (fromPath === path || fromPath === 'root') {
+      return;
+    }
     dispatch({
       type: 'nodePath',
       payload: {
