@@ -2,6 +2,7 @@ import { useId, useRef, useState, MouseEventHandler, DragEventHandler } from "re
 import PopupSelect from "./PopupSelect";
 import { BlockElement, BlockType } from "../types";
 import "./BasicBlock.css"
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
 export interface BasicBlockProps {
   displayName?: string | JSX.Element,
@@ -10,6 +11,7 @@ export interface BasicBlockProps {
   disableRemove?: boolean,
   disableDrag?: boolean,
   allowDragPropagation?: boolean,
+  defaultExpanded?: boolean,
   className?: string, // supplement class names
   onAdd?: (blockType: BlockType) => void;
   onRemove?: () => void;
@@ -30,6 +32,7 @@ const BasicBlock = ({
   disableRemove,
   disableDrag = false,
   allowDragPropagation = false,
+  defaultExpanded = true,
   onAdd,
   onRemove,
   onDrag,
@@ -44,6 +47,7 @@ const BasicBlock = ({
   const blockRef = useRef(null)
   const [hovered, setHovered] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [expanded,setExpanded] = useState(defaultExpanded)
 
   const handleMouseOver: MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation(); // Prevent event from bubbling up to parent blocks
@@ -120,9 +124,17 @@ const BasicBlock = ({
       onDragEnd={handleDragEnd}
       onDrop={handleDrop} 
     >
-      <div className="block-header">{displayName}</div>
+     
+      <div className="block-header">
+        {displayName}
+        {hovered && (
+          <button type="button" onClick={() => {setExpanded((old) => !old)}} className="expand-btn">
+            {expanded ? <FiMinimize2 /> :<FiMaximize2 />}
+          </button>
+        )}
+      </div>
       <div className="block-content">
-        {children}
+        {expanded ? children : '...'}
       </div>
       <div className={`block-footer ${hovered ? '' : 'hidden'}`}>
         {!disableAdd && (

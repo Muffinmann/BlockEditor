@@ -67,6 +67,12 @@
   background-color: #2a9d8f;
 }
 
+.expand-btn {
+  border: none;
+  background-color: transparent;
+  padding: 5px 15px;
+}
+
 .evaluation-block>.block-header {
   color: #ffa500;
 }
