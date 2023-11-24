@@ -84,3 +84,9 @@
 .falsy-block>.block-header {
   color: #ff0000;
 }
+
+.block.evaluation-block,
+.block.truthy-block,
+.block.falsy-block {
+  box-shadow: none;
+}
