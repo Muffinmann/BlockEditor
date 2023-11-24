@@ -1,4 +1,4 @@
-import { Children, useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
@@ -143,6 +143,9 @@ const addBlockNode = (obj: BlockNode, path: string[], newBlockType: BlockType) =
 
 const reducer = (state: BlockNode, action: BlockUpdateAction) => {
   console.count("running reducer")
+  if (action.type === 'sync') {
+    return action.payload
+  }
   if (action.type === 'remove') {
     return removeBlockNode(state, action.payload.split('.')) 
   }
@@ -186,8 +189,33 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
 }
 
 function App() {
-  const [tree, dispatch] = useReducer(reducer, testTree)
-  console.log({tree})
+  const [tree, dispatch] = useReducer(reducer, testTree, (arg) => {
+    const currentData = localStorage.getItem('block-data')
+    if (currentData) {
+      return JSON.parse(currentData) as BlockNode
+    } 
+    return arg
+  })
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      dispatch({
+        type: 'sync',
+        payload: JSON.parse(e.newValue as string) as BlockNode
+      })
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [])
+
+
+  useEffect(() => {
+    localStorage.setItem('block-data', JSON.stringify(tree))
+  }, [tree])
+
+
   return (
     <main>
       <BlockDispatcherProvider dispatch={dispatch}>

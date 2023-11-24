@@ -40,6 +40,9 @@ export type BlockUpdateAction = {
     from: string,
     to: string,
   }
+} | {
+  type: 'sync',
+  payload: BlockNode,
 }
 
 export type BlockElement = string | null | undefined | JSX.Element | JSX.Element[]
