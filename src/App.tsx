@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { Children, useReducer } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
@@ -10,22 +10,31 @@ const testTree: BlockNode = {
   name: 'Root',
   children: [
     {
-      type: 'If',
-      children: [
-        {
-          type: "StrictEqual",
-          children: [
-            {
-              type: 'Var',
-              value: 'test_field_key'
-            },
-            'test_value'
-          ]
-        },
-        'correct',
-        'wrong',
-      ]
-    }
+      type: 'Category',
+      name: 'Sub 1',
+      children: [    {
+        type: 'If',
+        children: [
+          {
+            type: "StrictEqual",
+            children: [
+              {
+                type: 'Var',
+                value: 'test_field_key'
+              },
+              'test_value'
+            ]
+          },
+          'correct',
+          'wrong',
+        ]
+      }],
+    },
+    {
+      type: 'Category',
+      name: 'Sub 2',
+      children: [    ],
+    },
   ]
 }
 
@@ -66,7 +75,8 @@ const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTa
       return o 
     }) 
 
-    return updatedArray.filter(Boolean) as BlockNode[];
+    // return updatedArray.filter(Boolean) as BlockNode[];
+    return updatedArray as BlockNode[];
   } 
 
 
@@ -144,6 +154,28 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
   }
   if (action.type === 'updateNode') {
     return recursiveUpdate(state, action.payload.path.split('.'), action.payload.callback) as BlockNode
+  }
+  if (action.type === 'nodePath') {
+    let source: BlockNode 
+    let destination: BlockNode | null = null
+    // get the source node
+    recursiveUpdate(state, action.payload.from.split('.'), (fromNode) => {
+      source = fromNode as BlockNode
+      return fromNode
+    } )
+
+    const updated = recursiveUpdate(state, action.payload.to.split('.'), (toNode) => {
+      if (typeof toNode === 'object' && 'children' in toNode) {
+        toNode.children.push(source)
+        return toNode
+      }
+      destination = toNode as BlockNode
+      return source 
+    }) as BlockNode
+
+    return recursiveUpdate(updated, action.payload.from.split('.'), () => {
+      return destination
+    } ) as BlockNode
   }
   return state
 }

@@ -34,6 +34,12 @@ export type BlockUpdateAction = {
     path: string,
     callback: (n: BlockNode | BlockNode[]) => BlockNode | BlockNode[]
   }
+} | {
+  type: 'nodePath',
+  payload: {
+    from: string,
+    to: string,
+  }
 }
 
 export type BlockElement = string | null | undefined | JSX.Element | JSX.Element[]
