@@ -2,7 +2,7 @@
 edit logic with blocks
 
 # TODOs
-- [] Draggable
+- [x] Draggable
 - [] Parse existing blocks
 - [] Download
 - [] Shortcut for formulas
