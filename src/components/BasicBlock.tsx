@@ -20,7 +20,7 @@ export interface BasicBlockProps {
   onDragLeave?:DragEventHandler<HTMLDivElement>,
   onDragEnd?:DragEventHandler<HTMLDivElement>,
   onDrop?:DragEventHandler<HTMLDivElement>,
-  children: BlockElement;
+  children?: BlockElement;
 }
 
 const BasicBlock = ({
