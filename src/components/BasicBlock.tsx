@@ -45,13 +45,16 @@ const BasicBlock = ({
   children }: BasicBlockProps) => {
   const blockId = useId()
   const blockRef = useRef(null)
+  const blockContentRef = useRef(null)
   const [hovered, setHovered] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [expanded,setExpanded] = useState(defaultExpanded)
 
   const handleMouseOver: MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation(); // Prevent event from bubbling up to parent blocks
-    setHovered(true);
+    if (e.target !== blockContentRef.current){
+      setHovered(true);
+    }
   };
 
   const handleMouseOut: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -133,7 +136,7 @@ const BasicBlock = ({
           </button>
         )}
       </div>
-      <div className="block-content">
+      <div ref={blockContentRef} className="block-content">
         {expanded ? children : '...'}
       </div>
       <div className={`block-footer ${hovered ? '' : 'hidden'}`}>
