@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, DragEventHandler, useState } from "react";
 import { FiMaximize2, FiMinimize2  } from "react-icons/fi";import {} from 'react-icons/hi';
 import { BlockElement, BlockType } from "../types";
 import BasicBlock from "./BasicBlock";
@@ -48,12 +48,20 @@ const CategoryBlock = ({
   onAdd,
   onRemove,
   onNameChange,
+  onDragStart,
+  onDrop,
 }: {
   children: BlockElement,
   displayName: string,
   onAdd: (type: BlockType) => void,
   onRemove: () => void,
   onNameChange: (name: string) => void,
+  onDrag?: DragEventHandler<HTMLDivElement>,
+  onDragStart?:DragEventHandler<HTMLDivElement>,
+  onDragEnter?:DragEventHandler<HTMLDivElement>,
+  onDragOver?:DragEventHandler<HTMLDivElement>,
+  onDragLeave?:DragEventHandler<HTMLDivElement>,
+  onDrop?:DragEventHandler<HTMLDivElement>,  
 }) => {
   const [expanded,setExpanded] = useState(false)
   if (!expanded) {
@@ -62,7 +70,7 @@ const CategoryBlock = ({
         <button type="button" onClick={() => {setExpanded(true)}}>
           <FiMaximize2 />
         </button>
-        <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} disableAdd disableRemove >...</BasicBlock>
+        <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} onDragStart={onDragStart} onDrop={onDrop} disableAdd disableRemove>...</BasicBlock>
       </div>
     )
   }
@@ -71,7 +79,7 @@ const CategoryBlock = ({
       <button type="button" onClick={() => {setExpanded(false)}}>
         <FiMinimize2 />
       </button>
-      <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} onAdd={onAdd} onRemove={onRemove}>
+      <BasicBlock displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />} onAdd={onAdd} onRemove={onRemove}  onDragStart={onDragStart} onDrop={onDrop}>
         {children}
       </BasicBlock>
     </div>
