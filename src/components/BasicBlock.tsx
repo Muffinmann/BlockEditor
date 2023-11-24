@@ -47,6 +47,7 @@ const BasicBlock = ({
   const blockRef = useRef(null)
   const [hovered, setHovered] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [isDropTarget, setIsDropTarget] = useState(false);
   const [expanded,setExpanded] = useState(defaultExpanded)
 
   const handleMouseOver: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -70,6 +71,7 @@ const BasicBlock = ({
   }
   const handleDragStart:DragEventHandler<HTMLDivElement> = (ev) => {
     !allowDragPropagation && ev.stopPropagation()
+    ev.dataTransfer.setDragImage(blockRef.current!, 10, 10)
     if (onDragStart) {
       onDragStart(ev)
     }
@@ -84,18 +86,21 @@ const BasicBlock = ({
     !allowDragPropagation && ev.stopPropagation()
     ev.preventDefault() 
     ev.dataTransfer.dropEffect = "move";
+    setIsDropTarget(true)
     if (onDragOver) {
       onDragOver(ev)
     }
   }
   const handleDragLeave:DragEventHandler<HTMLDivElement> = (ev) => {
     !allowDragPropagation && ev.stopPropagation()
+    setIsDropTarget(false)
     if (onDragLeave) {
       onDragLeave(ev)
     }
   }
   const handleDragEnd:DragEventHandler<HTMLDivElement> = (ev) => {
     !allowDragPropagation && ev.stopPropagation()
+    setIsDropTarget(false)
     if (onDragEnd){
       onDragEnd(ev)
     }
@@ -103,6 +108,7 @@ const BasicBlock = ({
   const handleDrop:DragEventHandler<HTMLDivElement> = (ev) => {
     !allowDragPropagation && ev.stopPropagation()
     ev.preventDefault() 
+    setIsDropTarget(false)
     if (onDrop) {
       onDrop(ev)
     }
@@ -113,7 +119,7 @@ const BasicBlock = ({
       draggable={!disableDrag}
       ref={blockRef}
       id={blockId}
-      className={`block ${className} ${hovered ? 'hovered' : ''}`}
+      className={`block ${className} ${hovered ? 'hovered' : ''} ${isDropTarget ? 'drop-target' : ''}`}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onDrag={handleDrag}

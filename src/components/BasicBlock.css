@@ -13,6 +13,10 @@
   /* Slightly different background color on hover */
 }
 
+.block.drop-target {
+  background-color: rgba(89, 143, 172, 0.2);
+}
+
 .block-header {
   font-size: 16px;
   color: #2a9d8f;
