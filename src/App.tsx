@@ -57,7 +57,7 @@ const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTa
     return obj
   }
 
-  if (currentSeg === '') { // empty string means the root object
+  if (currentSeg === 'root') { 
     return recursiveUpdate(obj, path, onReachTarget)
   }
 
@@ -212,14 +212,16 @@ function App() {
 
 
   useEffect(() => {
-    localStorage.setItem('block-data', JSON.stringify(tree))
+    if (tree) {
+      localStorage.setItem('block-data', JSON.stringify(tree))
+    }
   }, [tree])
 
 
   return (
     <main>
       <BlockDispatcherProvider dispatch={dispatch}>
-        <BlockRenderer path='' node={tree} />
+        <BlockRenderer path='root' node={tree} />
       </BlockDispatcherProvider>
     </main>
   )
