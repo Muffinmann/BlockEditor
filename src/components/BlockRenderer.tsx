@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react"
+import { ChangeEvent, DragEventHandler } from "react"
 import { useBlockDispatcher } from "../hooks/useBlockDispatcher"
 import { BlockNode, BlockType } from "../types"
 import BasicBlock from "./BasicBlock"
@@ -51,31 +51,46 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
       }
     })
   }
+
+  const handleDragStart: DragEventHandler<HTMLDivElement>=(ev) => {
+    ev.dataTransfer.setData('text/plain', path)
+  }
+  const handleDrop: DragEventHandler<HTMLDivElement>=(ev) => {
+    const fromPath = ev.dataTransfer.getData('text/plain')
+    dispatch({
+      type: 'nodePath',
+      payload: {
+        from: fromPath,
+        to: path
+      }
+    })
+    console.log('MOVE FROM [',fromPath,'] TO [',path,']' )
+  }
   if (!node) return null;
   if (typeof node === 'string') {
     // return <InputBlock path={path} value={node} />
     return (
-      <BasicBlock displayName="Text" disableAdd onRemove={handleRemove}>
+      <BasicBlock displayName="Text" disableAdd onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         <Input value={node} onChange={handleValueChange} />
       </BasicBlock>)
   } 
   if (node.type === 'Category') {
     return (
-      <CategoryBlock displayName={node.name} onAdd={handleAdd} onRemove={handleRemove} onNameChange={handleNameChange}>
+      <CategoryBlock displayName={node.name} onAdd={handleAdd} onRemove={handleRemove} onNameChange={handleNameChange} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </CategoryBlock>
     )
   }
   if (node.type === 'If') {
     return (
-      <BasicBlock onRemove={handleRemove} displayName="If" >
-        <BasicBlock disableAdd={Boolean(node.children[0])} onAdd={handleAdd} disableRemove displayName="Evaluation" className="evaluation-block">
+      <BasicBlock onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
+        <BasicBlock disableAdd={Boolean(node.children[0])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[0])} displayName="Evaluation" className="evaluation-block">
           <BlockRenderer path={`${path}.children.0`} node={node.children[0]} />
         </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[1])} onAdd={handleAdd} disableRemove displayName="Truthy" className="truthy-block">
+        <BasicBlock disableAdd={Boolean(node.children[1])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[1])} displayName="Truthy" className="truthy-block">
           <BlockRenderer path={`${path}.children.1`} node={node.children[1]} />
         </BasicBlock>
-        <BasicBlock disableAdd={Boolean(node.children[2])} onAdd={handleAdd} disableRemove displayName="Falsy" className="falsy-block">
+        <BasicBlock disableAdd={Boolean(node.children[2])} onAdd={handleAdd} disableRemove allowDragPropagation disableDrag={Boolean(node.children[2])} displayName="Falsy" className="falsy-block">
           <BlockRenderer path={`${path}.children.2`} node={node.children[2]} />
         </BasicBlock>
       </BasicBlock>
@@ -83,14 +98,14 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   }
   if (node.type === "Var") {
     return (
-      <BasicBlock disableAdd displayName="Variable" onRemove={handleRemove} >
+      <BasicBlock disableAdd displayName="Variable" onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         <Input value={node.value} onChange={handleValueChange} />
       </BasicBlock>
     )
   }
   if (node.type === 'StrictEqual') {
     return (
-      <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} >
+      <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
