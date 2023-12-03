@@ -32,6 +32,17 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
       }
     })
   }
+  const handleArrayChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.split(',').map((str) => str.trim())
+    dispatch({
+      type: 'updateValue',
+      payload: {
+        path,
+        nextValue:value
+      }
+    })
+
+  }
 
   const handleNameChange = (name: string) => {
     dispatch({
@@ -105,6 +116,56 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   if (node.type === 'StrictEqual') {
     return (
       <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+
+  if (node.type === 'NotEqual') {
+    return (
+      <BasicBlock displayName="Not Equal (!==)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'GreaterThan') {
+    return (
+      <BasicBlock displayName="Greater Than (>)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'SmallerThan') {
+    return (
+      <BasicBlock displayName="Smaller Than (<)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'NotNull') {
+    return (
+      <BasicBlock displayName="Not Null (!!)" disableAdd={node.children.length > 0}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'List') {
+    return (
+      <BasicBlock displayName="List" disableAdd  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        <textarea value={node.value.toString()} onChange={handleArrayChange} />
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'And') {
+    return (
+      <BasicBlock displayName="And" onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'Or') {
+    return (
+      <BasicBlock displayName="Or" onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )

@@ -87,9 +87,9 @@ const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTa
   
 }
 
-const updateBlockNode = (obj: BlockNode, path: string[], value: string) => {
+const updateBlockNode = (obj: BlockNode, path: string[], value: string | string[] | number[]) => {
   return recursiveUpdate(obj, path, (obj) => {
-    if (typeof obj === "string") {
+    if (typeof obj === "string" && typeof value === 'string') {
       return value
     }
     if (typeof obj === 'object') {
@@ -97,7 +97,7 @@ const updateBlockNode = (obj: BlockNode, path: string[], value: string) => {
         return {
           ...obj,
           value
-        }
+        } as BlockNode
       }
     }
     return obj
@@ -120,8 +120,11 @@ const createBlockNode = (type: BlockType): BlockNode => {
       type,
       children: []
     }
-  case 'If':
-  case 'StrictEqual':
+  case 'List':
+    return {
+      type,
+      value: []
+    }
   default:
     return {
       type,

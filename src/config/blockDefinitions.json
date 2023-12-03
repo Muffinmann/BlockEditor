@@ -26,5 +26,34 @@
     "disableButton": [
       "add"
     ]
+  },
+  {
+    "type": "StrictEqual",
+    "blockHeader": "Strict Equal (===)",
+    "slots": 2,
+    "slotType": [
+      "Block"
+    ]
+  },
+  {
+    "type": "NotEqual"
+  },
+  {
+    "type": "NotNull"
+  },
+  {
+    "type": "List"
+  },
+  {
+    "type": "And"
+  },
+  {
+    "type": "Or"
+  },
+  {
+    "type": "GreaterThan"
+  },
+  {
+    "type": "SmallerThan"
   }
 ]

@@ -5,12 +5,16 @@ export type BlockNode = {
   name: string,
   children: BlockNode[]
 } | {
-  type: 'If' | 'StrictEqual',
+  type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan',
   children: BlockNode[],
 } | {
   type: 'Var',
   value: string,
-} | string 
+} | {
+  type: "List",
+  value: string[] | number[]
+}
+| string 
 
 
 export type BlockUpdateAction = {
@@ -26,7 +30,7 @@ export type BlockUpdateAction = {
   type: 'updateValue',
   payload: {
     path: string,
-    nextValue: string,
+    nextValue: string | string[] | number[],
   }
 } | {
   type: 'updateNode',
