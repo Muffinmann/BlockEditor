@@ -3,8 +3,84 @@ import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
 import BlockRenderer from './components/BlockRenderer'
+import testJSON from './config/test.json';
 
 
+const parseExistingBlocks = (input: unknown): BlockNode => {
+  // console.log({ input, type: typeof input })
+  if (input === undefined || input === null || Number.isNaN(input)) {
+    return input;
+  }
+
+  if (typeof input === 'boolean') {
+    return {
+      type: 'Boolean',
+      value: String(input),
+    }
+  }
+  if (Array.isArray(input)) {
+    return input.map((i) => parseExistingBlocks(i))
+  }
+  if (typeof input === 'object' && Object.keys(input).length > 1) {
+    return Object.entries(input).map(([key, val]) => ({
+      type: 'Category',
+      name: key,
+      children: Array.isArray(val) ? parseExistingBlocks(val) : [parseExistingBlocks(val) || []]
+    }))
+  }
+  if (typeof input === 'object' && Object.keys(input).length === 1) {
+    if ('if' in input) {
+      return {
+        type: 'If',
+        children: parseExistingBlocks(input.children),
+      }
+    } else if ('===' in input) {
+      return {
+        type: 'StrictEqual',
+        children: parseExistingBlocks(input.children)
+      }
+    } else if ('!==' in input) {
+
+      return {
+        type: 'NotEqual',
+        children: parseExistingBlocks(input.children)
+      }
+    } else if ('!!' in input) {
+
+      return {
+        type: 'NotNull',
+        children: parseExistingBlocks(input.children)
+      }
+    } else if ('var' in input) {
+      return {
+        type: 'Var',
+        value: input.var
+      }
+    } else if ('every' in input) {
+      return {
+        type: 'Every',
+        children: parseExistingBlocks(input.children)
+      }
+    } else if ('some' in input) {
+      return {
+        type: 'Some',
+        children: parseExistingBlocks(input.children)
+      }
+    }
+    return {
+      type: 'Category',
+      name: Object.keys(input)[0],
+      children: Object.values(input)[0]
+    }
+
+  }
+
+
+}
+
+console.log(
+ 'test res = ', parseExistingBlocks(testJSON)
+)
 const testTree: BlockNode = {
   type: 'Category',
   name: 'Root',
@@ -12,7 +88,7 @@ const testTree: BlockNode = {
     {
       type: 'Category',
       name: 'Sub 1',
-      children: [    {
+      children: [{
         type: 'If',
         children: [
           {
@@ -33,7 +109,7 @@ const testTree: BlockNode = {
     {
       type: 'Category',
       name: 'Sub 2',
-      children: [    ],
+      children: [],
     },
   ]
 }
@@ -57,7 +133,7 @@ const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTa
     return obj
   }
 
-  if (currentSeg === 'root') { 
+  if (currentSeg === 'root') {
     return recursiveUpdate(obj, path, onReachTarget)
   }
 
@@ -72,19 +148,19 @@ const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTa
       if (index === i) {
         return recursiveUpdate(obj[i], path, onReachTarget)
       }
-      return o 
-    }) 
+      return o
+    })
 
     // return updatedArray.filter(Boolean) as BlockNode[];
     return updatedArray as BlockNode[];
-  } 
+  }
 
 
   return {
     ...obj,
     [currentSeg]: recursiveUpdate(obj[currentSeg as keyof BlockNode], path, onReachTarget)
   } as BlockNode;
-  
+
 }
 
 const updateBlockNode = (obj: BlockNode, path: string[], value: string | string[] | number[]) => {
@@ -108,28 +184,33 @@ const removeBlockNode = (obj: BlockNode, path: string[]) => {
 }
 
 const createBlockNode = (type: BlockType): BlockNode => {
-  switch(type) {
-  case 'Var':
-    return {
-      type,
-      value: ""
-    }
-  case 'Category':
-    return {
-      name: '',
-      type,
-      children: []
-    }
-  case 'List':
-    return {
-      type,
-      value: []
-    }
-  default:
-    return {
-      type,
-      children: []
-    }
+  switch (type) {
+    case 'Var':
+      return {
+        type,
+        value: ""
+      }
+    case 'Category':
+      return {
+        name: '',
+        type,
+        children: []
+      }
+    case 'List':
+      return {
+        type,
+        value: []
+      }
+    case 'Boolean':
+      return {
+        type,
+        value: '',
+      }
+    default:
+      return {
+        type,
+        children: []
+      }
   }
 }
 const addBlockNode = (obj: BlockNode, path: string[], newBlockType: BlockType) => {
@@ -150,7 +231,7 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
     return action.payload
   }
   if (action.type === 'remove') {
-    return removeBlockNode(state, action.payload.split('.')) 
+    return removeBlockNode(state, action.payload.split('.'))
   }
   if (action.type === 'add') {
     return addBlockNode(state, action.payload.path.split('.'), action.payload.blockType)
@@ -162,13 +243,13 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
     return recursiveUpdate(state, action.payload.path.split('.'), action.payload.callback) as BlockNode
   }
   if (action.type === 'nodePath') {
-    let source: BlockNode 
+    let source: BlockNode
     let destination: BlockNode | null = null
     // get the source node
     recursiveUpdate(state, action.payload.from.split('.'), (fromNode) => {
       source = fromNode as BlockNode
       return fromNode
-    } )
+    })
 
     const updated = recursiveUpdate(state, action.payload.to.split('.'), (toNode) => {
       if (typeof toNode === 'object' && 'children' in toNode) {
@@ -181,22 +262,22 @@ const reducer = (state: BlockNode, action: BlockUpdateAction) => {
         return toNode
       }
       destination = toNode as BlockNode
-      return source 
+      return source
     }) as BlockNode
 
     return recursiveUpdate(updated, action.payload.from.split('.'), () => {
       return destination
-    } ) as BlockNode
+    }) as BlockNode
   }
   return state
 }
 
 function App() {
-  const [tree, dispatch] = useReducer(reducer, testTree, (arg) => {
+  const [tree, dispatch] = useReducer(reducer, parseExistingBlocks(testJSON), (arg) => {
     const currentData = localStorage.getItem('block-data')
     if (currentData) {
       return JSON.parse(currentData) as BlockNode
-    } 
+    }
     return arg
   })
 

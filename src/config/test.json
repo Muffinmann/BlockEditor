@@ -1,0 +1,50 @@
+{
+  "armpit-depth": {
+    "isVisible": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "required": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "validation": {},
+    "defaultValue": {},
+    "value": {},
+    "hiddenOptions": {}
+  },
+  "clavicula-depth": {
+    "isVisible": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "required": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "validation": {},
+    "defaultValue": {},
+    "value": {},
+    "hiddenOptions": {}
+  },
+  "pectus_carinatum-no_pressure": {
+    "isVisible": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "required": {
+      "4": false,
+      "5": false,
+      "6": false
+    },
+    "validation": {},
+    "defaultValue": {},
+    "value": {},
+    "hiddenOptions": {}
+  }
+}

@@ -5,7 +5,7 @@ import BasicBlock from "./BasicBlock"
 import CategoryBlock from "./CategoryBlock"
 import Input from "./Input"
 
-export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: string }) => {
+export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | BlockNode[], path: string }) => {
   const dispatch = useBlockDispatcher()
   const handleAdd = (type: BlockType) => {
     dispatch({
@@ -23,12 +23,13 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
     })
   }
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+    let value = e.target.value
+
     dispatch({
       type: 'updateValue',
       payload: {
         path,
-        nextValue:value
+        nextValue: value
       }
     })
   }
@@ -38,7 +39,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
       type: 'updateValue',
       payload: {
         path,
-        nextValue:value
+        nextValue: value
       }
     })
 
@@ -49,7 +50,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
       type: 'updateNode',
       payload: {
         path,
-        callback:(node) => {
+        callback: (node) => {
           console.log("update node", node)
           if (typeof node === 'object' && ('name' in node)) {
             return {
@@ -63,10 +64,10 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
     })
   }
 
-  const handleDragStart: DragEventHandler<HTMLDivElement>=(ev) => {
+  const handleDragStart: DragEventHandler<HTMLDivElement> = (ev) => {
     ev.dataTransfer.setData('text/plain', path)
   }
-  const handleDrop: DragEventHandler<HTMLDivElement>=(ev) => {
+  const handleDrop: DragEventHandler<HTMLDivElement> = (ev) => {
     const fromPath = ev.dataTransfer.getData('text/plain')
     if (fromPath === path || fromPath === 'root') {
       return;
@@ -78,16 +79,21 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
         to: path
       }
     })
-    console.log('MOVE FROM [',fromPath,'] TO [',path,']' )
+    console.log('MOVE FROM [', fromPath, '] TO [', path, ']')
   }
   if (!node) return null;
+  if (Array.isArray(node)) {
+    return node.map((n, i) => (
+      <BlockRenderer key={i} node={n} path={`${path}.${i}`} />
+    ))
+  }
   if (typeof node === 'string') {
     // return <InputBlock path={path} value={node} />
     return (
       <BasicBlock displayName="Text" disableAdd onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         <Input value={node} onChange={handleValueChange} />
       </BasicBlock>)
-  } 
+  }
   if (node.type === 'Category') {
     return (
       <CategoryBlock displayName={node.name} onAdd={handleAdd} onRemove={handleRemove} onNameChange={handleNameChange} onDragStart={handleDragStart} onDrop={handleDrop}>
@@ -97,7 +103,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   }
   if (node.type === 'If') {
     return (
-      <BasicBlock  onAdd={handleAdd} onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock onAdd={handleAdd} onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.slice(0, 3).map((child, i) => (
           <BasicBlock key={i} disableAdd disableRemove disableDrag allowDragPropagation displayName={i === 0 ? "Evaluation" : i === 1 ? "Truthy" : "Falsy"} className={i === 0 ? "evaluation-block" : i === 1 ? "truthy-block" : "falsy-block"}>
             <BlockRenderer node={child} path={`${path}.children.${i}`} />
@@ -115,7 +121,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
   }
   if (node.type === 'StrictEqual') {
     return (
-      <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Strict Equal (===)" disableAdd={node.children.length > 1} onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
@@ -123,35 +129,35 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
 
   if (node.type === 'NotEqual') {
     return (
-      <BasicBlock displayName="Not Equal (!==)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Not Equal (!==)" disableAdd={node.children.length > 1} onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
   }
   if (node.type === 'GreaterThan') {
     return (
-      <BasicBlock displayName="Greater Than (>)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Greater Than (>)" disableAdd={node.children.length > 1} onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
   }
   if (node.type === 'SmallerThan') {
     return (
-      <BasicBlock displayName="Smaller Than (<)" disableAdd={node.children.length > 1}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Smaller Than (<)" disableAdd={node.children.length > 1} onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
   }
   if (node.type === 'NotNull') {
     return (
-      <BasicBlock displayName="Not Null (!!)" disableAdd={node.children.length > 0}  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Not Null (!!)" disableAdd={node.children.length > 0} onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
       </BasicBlock>
     )
   }
   if (node.type === 'List') {
     return (
-      <BasicBlock displayName="List" disableAdd  onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="List" disableAdd onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         <textarea value={node.value.toString()} onChange={handleArrayChange} />
       </BasicBlock>
     )
@@ -167,6 +173,20 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode, path: 
     return (
       <BasicBlock displayName="Or" onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
         {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
+      </BasicBlock>
+    )
+  }
+  if (node.type === 'Boolean') {
+    return (
+      <BasicBlock displayName="Boolean" onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+        <label>
+          true
+          <Input type="radio" value="true" checked={node.value === 'true'} onChange={handleValueChange} />
+        </label>
+        <label>
+          false
+          <Input type="radio" value="false" checked={node.value === 'false'} onChange={handleValueChange} />
+        </label>
       </BasicBlock>
     )
   }

@@ -8,11 +8,14 @@ export type BlockNode = {
   type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan',
   children: BlockNode[],
 } | {
-  type: 'Var',
+  type: 'Var' | 'Formular',
   value: string,
 } | {
   type: "List",
   value: string[] | number[]
+} | {
+  type: 'Boolean',
+  value: 'true' | 'false' | ''
 }
 | string 
 

@@ -55,5 +55,11 @@
   },
   {
     "type": "SmallerThan"
+  },
+  {
+    "type": "Boolean"
+  },
+  {
+    "type": "Formular"
   }
 ]
