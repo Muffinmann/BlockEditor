@@ -11,9 +11,15 @@
       "6": false
     },
     "validation": {},
-    "defaultValue": {},
-    "value": {},
-    "hiddenOptions": {}
+    "defaultValue": {
+      "if": [
+        {"!==": [{"var": "key"}, "target_value"]},
+        10,
+        20
+      ]
+    },
+    "value": { },
+    "hiddenOptions": ["opt1", "opt2"] 
   },
   "clavicula-depth": {
     "isVisible": {
@@ -28,7 +34,11 @@
     },
     "validation": {},
     "defaultValue": {},
-    "value": {},
+    "value": {
+      "4": {"var": "field_key1"},
+      "5": {"var": "field_key2"},
+      "6": {"var": "field_key3"}
+    },
     "hiddenOptions": {}
   },
   "pectus_carinatum-no_pressure": {
