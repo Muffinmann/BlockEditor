@@ -1,8 +1,7 @@
 [
   {
     "type": "Category",
-    "blockHeader": "$userInput",
-    "slots": 1,
+    "blockHeader": "{{userInput}}",
     "slotType": [
       "Block"
     ]
@@ -10,7 +9,6 @@
   {
     "type": "If",
     "blockHeader": "If",
-    "slots": 3,
     "slotType": [
       "Block",
       "Input"
@@ -19,47 +17,57 @@
   {
     "type": "Var",
     "blockHeader": "Variable",
-    "slots": 1,
+    "maxSlots": 1,
     "slotType": [
       "Input"
-    ],
-    "disableButton": [
-      "add"
     ]
   },
   {
     "type": "StrictEqual",
     "blockHeader": "Strict Equal (===)",
-    "slots": 2,
+    "maxSlots": 2,
     "slotType": [
       "Block"
     ]
   },
   {
-    "type": "NotEqual"
+    "type": "NotEqual",
+    "blockHeader": "Not Equal (!==)",
+    "maxSlots": 2
   },
   {
-    "type": "NotNull"
+    "type": "NotNull",
+    "blockHeader": "Not Null (!!)",
+    "maxSlots": 1
   },
   {
-    "type": "List"
+    "type": "List",
+    "blockHeader": "List",
+    "disableAdd": true
   },
   {
-    "type": "And"
+    "type": "And",
+    "blockHeader": "And"
   },
   {
-    "type": "Or"
+    "type": "Or",
+    "blockHeader": "Or"
   },
   {
-    "type": "GreaterThan"
+    "type": "GreaterThan",
+    "blockHeader": "Greater Than (>)"
   },
   {
-    "type": "SmallerThan"
-  },
-  {
-    "type": "Boolean"
+    "type": "SmallerThan",
+    "blockHeader": "Smaller Than (<)"
   },
   {
     "type": "Formular"
-  }
+  },
+  {
+    "type": "Text"
+  },
+  {"type": "Number"},
+  {"type": "Boolean"}
+
 ]
