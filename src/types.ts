@@ -1,24 +1,14 @@
-export type BlockType = (object & BlockNode)['type']
+export type BlockType = (object & BlockNode)['type'] & 'Text' & 'Number' & 'Boolean'
 
 export type BlockNode = {
   type: 'Category',
   name: string,
   children: BlockNode[]
 } | {
-  type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan',
-  children: BlockNode[],
-} | {
-  type: 'Var' | 'Formular',
-  value: string,
-} | {
-  type: "List",
-  value: string[] | number[]
-} | {
-  type: 'Boolean',
-  value: 'true' | 'false' | ''
+  type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan' | 'Every' | 'Some'| 'Var' | 'Formular' | 'Boolean' | 'List' | 'Not',
+  children: BlockNode[]
 }
-| string 
-
+| string | null | number | boolean
 
 export type BlockUpdateAction = {
   type: 'remove',
@@ -33,7 +23,7 @@ export type BlockUpdateAction = {
   type: 'updateValue',
   payload: {
     path: string,
-    nextValue: string | string[] | number[],
+    nextValue: string | number | boolean | string[] | number[],
   }
 } | {
   type: 'updateNode',
