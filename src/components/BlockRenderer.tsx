@@ -92,22 +92,19 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
 
   if (typeof node === 'string') {
     return (
-      <BasicBlock displayName="Text" disableAdd onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
-        <Input value={node} onChange={handleValueChange} />
-      </BasicBlock>)
+      <Input value={node} onChange={handleValueChange} placeholder="Enter text" />
+      )
   }
   if (typeof node === 'number') {
     return (
-      <BasicBlock displayName="Number" disableAdd onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
-        <Input type="number" value={node} onChange={handleValueChange} />
-      </BasicBlock>
+        <Input type="number" value={node} onChange={handleValueChange} placeholder="Enter number" />
     )
   }
 
   if (typeof node === 'boolean') {
     console.log('Boolean node', node)
     return (
-      <BasicBlock displayName="Boolean" disableAdd onAdd={handleAdd} onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop}>
+      <div>
         <label>
           true
           <Input type="radio" value="true" checked={node} onChange={handleValueChange} />
@@ -116,7 +113,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
           false
           <Input type="radio" value="false" checked={!node} onChange={handleValueChange} />
         </label>
-      </BasicBlock>
+        </div>
     )
   }
   if (Array.isArray(node)) {
