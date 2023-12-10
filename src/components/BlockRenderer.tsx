@@ -6,26 +6,14 @@ import CategoryBlock from "./CategoryBlock"
 import Input from "./Input"
 import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
 
-export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | BlockNode[], path: string }) => {
+const ArrayBlock = ({nodes, path}: {nodes: BlockNode[], path: string}) => {
+  return nodes.map((n, i) => (
+    <BlockRenderer key={i} node={n} path={`${path}.${i}`} />
+  ))
+}
+
+const PrimitiveBlock = ({node, path}: {node: string | number | boolean, path: string}) => {
   const dispatch = useBlockDispatcher()
-
-  const handleAdd = (type: BlockType) => {
-    dispatch({
-      type: 'add',
-      payload: {
-        path,
-        blockType: type
-      }
-    })
-  }
-
-  const handleRemove = () => {
-    dispatch({
-      type: 'remove',
-      payload: path,
-    })
-  }
-
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     let value: string | boolean | number = e.target.value
     if (value === 'true' || value === 'false') {
@@ -42,6 +30,59 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       }
     })
   }
+
+
+  if (typeof node === 'string') {
+    return (
+      <Input value={node} onChange={handleValueChange} placeholder="Enter text" />
+    )
+  }
+  if (typeof node === 'number') {
+    return (
+      <Input type="number" value={node} onChange={handleValueChange} placeholder="Enter number" />
+    )
+  }
+
+  if (typeof node === 'boolean') {
+    return (
+      <div>
+        <label>
+          true
+          <Input type="radio" value="true" checked={node} onChange={handleValueChange} />
+        </label>
+        <label>
+          false
+          <Input type="radio" value="false" checked={!node} onChange={handleValueChange} />
+        </label>
+      </div>
+    )
+  }
+  return null;
+}
+
+const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) => {
+  const dispatch = useBlockDispatcher()
+
+  const handleAdd = (type: BlockType) => {
+    dispatch({
+      type: 'add',
+      payload: {
+        path,
+        blockType: type
+      }
+    })
+  }
+
+  const handleRemove = () => {
+    dispatch({
+      type: 'remove',
+      payload: {
+        path,
+        id: node.id,
+      },
+    })
+  }
+
 
   const handleArrayChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.split(',').map((str) => str.trim())
@@ -75,10 +116,12 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
   }
 
   const handleDragStart: DragEventHandler<HTMLDivElement> = (ev) => {
-    ev.dataTransfer.setData('text/plain', path)
+    ev.dataTransfer.setData('text/plain', path.concat('#', node.id))
   }
   const handleDrop: DragEventHandler<HTMLDivElement> = (ev) => {
-    const fromPath = ev.dataTransfer.getData('text/plain')
+    const fromPathWithId = ev.dataTransfer.getData('text/plain').split('#')
+    const fromPath = fromPathWithId[0]
+    const fromId = fromPathWithId[1]
     if (fromPath === path || fromPath === 'root') {
       return;
     }
@@ -86,43 +129,15 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       type: 'nodePath',
       payload: {
         from: fromPath,
+        fromId,
         to: path,
+        toId: node.id
       }
     })
-    console.log('MOVE FROM [', fromPath, '] TO [', path, ']')
+    console.log(`MOVE FROM [${fromPath}#${fromId}] TO [${path}#${node.id}]`)
   }
-  if (node === null) return null;
+  
 
-  if (typeof node === 'string') {
-    return (
-      <Input value={node} onChange={handleValueChange} placeholder="Enter text" />
-      )
-  }
-  if (typeof node === 'number') {
-    return (
-        <Input type="number" value={node} onChange={handleValueChange} placeholder="Enter number" />
-    )
-  }
-
-  if (typeof node === 'boolean') {
-    return (
-      <div>
-        <label>
-          true
-          <Input type="radio" value="true" checked={node} onChange={handleValueChange} />
-        </label>
-        <label>
-          false
-          <Input type="radio" value="false" checked={!node} onChange={handleValueChange} />
-        </label>
-        </div>
-    )
-  }
-  if (Array.isArray(node)) {
-    return node.map((n, i) => (
-      <BlockRenderer key={i} node={n} path={`${path}.${i}`} />
-    ))
-  }
   if (node.type === 'Category') {
     return (
       <CategoryBlock displayName={node.name} onAdd={handleAdd} onRemove={handleRemove} onNameChange={handleNameChange} onDragStart={handleDragStart} onDrop={handleDrop}>
@@ -160,6 +175,22 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       {node.children.map((child, i) => <BlockRenderer key={i} node={child} path={`${path}.children.${i}`} />)}
     </BasicBlock>
   )
+}
+
+export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | BlockNode[], path: string }) => {
+  if (node === null) return null;
+
+  if (Array.isArray(node)) {
+    return <ArrayBlock nodes={node} path={path} />
+  }
+
+  if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
+    return <PrimitiveBlock node={node} path={path} />
+  }
+
+  return < RecursiveBlock node={node} path={path} />
+
+ 
 }
 
 export default BlockRenderer;

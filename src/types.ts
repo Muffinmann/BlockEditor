@@ -14,7 +14,10 @@ export type BlockNode = {
 
 export type BlockUpdateAction = {
   type: 'remove',
-  payload: string,
+  payload: {
+    path: string,
+    id: string,
+  }
 } | {
   type: 'add',
   payload: {
@@ -38,6 +41,8 @@ export type BlockUpdateAction = {
   payload: {
     from: string,
     to: string,
+    fromId: string,
+    toId: string,
   }
 } | {
   type: 'sync',
