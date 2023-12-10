@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEventHandler } from "react"
+import { ChangeEvent, DragEventHandler, useId } from "react"
 import { useBlockDispatcher } from "../hooks/useBlockDispatcher"
 import { BlockNode, BlockType } from "../types"
 import BasicBlock from "./BasicBlock"
@@ -7,8 +7,8 @@ import Input from "./Input"
 import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
 
 export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | BlockNode[], path: string }) => {
-  console.log({ node, type: typeof node, path })
   const dispatch = useBlockDispatcher()
+
   const handleAdd = (type: BlockType) => {
     dispatch({
       type: 'add',
@@ -18,12 +18,14 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       }
     })
   }
+
   const handleRemove = () => {
     dispatch({
       type: 'remove',
       payload: path,
     })
   }
+
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     let value: string | boolean | number = e.target.value
     if (value === 'true' || value === 'false') {
@@ -40,6 +42,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       }
     })
   }
+
   const handleArrayChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.split(',').map((str) => str.trim())
     dispatch({
@@ -83,7 +86,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
       type: 'nodePath',
       payload: {
         from: fromPath,
-        to: path
+        to: path,
       }
     })
     console.log('MOVE FROM [', fromPath, '] TO [', path, ']')
@@ -102,7 +105,6 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
   }
 
   if (typeof node === 'boolean') {
-    console.log('Boolean node', node)
     return (
       <div>
         <label>

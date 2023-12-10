@@ -12,6 +12,7 @@
 // }
 
 import { BlockNode } from "../types";
+import uuidv4 from "./uuid";
 
 const AVAILABLE_OPERATORS = {
   '+': 'Plus',
@@ -33,7 +34,7 @@ const AVAILABLE_OPERATORS = {
   'and': 'And',
   'or': 'Or',
   'var': 'Var',
- } as const;
+} as const;
 
 
 type Operator = keyof typeof AVAILABLE_OPERATORS
@@ -80,6 +81,7 @@ const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
     if (type !== 'Plus' && type !== 'Minus' && type !== 'Multiply' && type !== 'Divide') {
       const children = Object.values((child: any) => parseExistingBlocks(child)) as BlockNode[]
       return {
+        id: uuidv4(),
         type,
         children,
       }
@@ -91,6 +93,7 @@ const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
   if (Array.isArray(input)) {
     if (input.length > 1 && input.every((i) => typeof i === 'string')) {
       return {
+        id: uuidv4(),
         type: 'List',
         children: input
       }
@@ -100,17 +103,20 @@ const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
   }
 
   if (Object.keys(input).length > 1) {
-      return Object.entries(input).map(([key, val]) => {
-        const childNodes = parseExistingBlocks(val)
-        return {
-          type: 'Category',
-          name: key,
-          children: Array.isArray(childNodes) ? childNodes : [childNodes]
-    }})
+    return Object.entries(input).map(([key, val]) => {
+      const childNodes = parseExistingBlocks(val)
+      return {
+        type: 'Category',
+        id: uuidv4(),
+        name: key,
+        children: Array.isArray(childNodes) ? childNodes : [childNodes]
+      }
+    })
   }
 
   return {
     type: 'Category',
+    id: uuidv4(),
     name: Object.keys(input)[0],
     children: Object.values(input).map(parseExistingBlocks) as BlockNode[]
   }

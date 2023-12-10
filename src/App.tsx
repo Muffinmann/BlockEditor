@@ -5,57 +5,9 @@ import './App.css'
 import BlockRenderer from './components/BlockRenderer'
 import testJSON from './config/test.json';
 import parseExistingBlocks from './utils/parseExistingBlocks'
+import recursiveUpdate from './utils/recursiveUpdate'
+import uuidv4 from './utils/uuid'
 
-
-const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTarget: (t: BlockNode | BlockNode[]) => BlockNode | BlockNode[] | null): null | BlockNode | BlockNode[] | BlockNode[keyof BlockNode] => {
-  if (!path) {
-    console.error("Expected 'path' argument to be type 'string[]', got 'undefined'.")
-    return obj;
-  }
-
-  if (!path.length) {
-    return onReachTarget(obj)
-  }
-
-  const currentSeg = path.shift()
-
-  if (currentSeg === undefined) {
-    console.error("Path segment is undefined")
-    return obj
-  }
-
-  if (currentSeg === 'root') {
-    return recursiveUpdate(obj, path, onReachTarget)
-  }
-
-  if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
-    return obj;
-  }
-
-  if (obj === null) {
-    return obj;
-  }
-  if (Array.isArray(obj)) {
-    // If obj is an array, update it without converting to an object
-    const updatedArray = obj.map((o, index) => {
-      const i = parseInt(currentSeg, 10)
-      if (index === i) {
-        return recursiveUpdate(obj[i], path, onReachTarget)
-      }
-      return o
-    })
-
-    // return updatedArray.filter(Boolean) as BlockNode[];
-    return updatedArray as BlockNode[];
-  }
-
-
-  return {
-    ...obj,
-    [currentSeg]: recursiveUpdate(obj[currentSeg as keyof BlockNode], path, onReachTarget)
-  } as BlockNode;
-
-}
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[]) => {
   return recursiveUpdate(obj, path, (obj) => {
@@ -91,12 +43,14 @@ const createBlockNode = (type: BlockType): BlockNode => {
     case 'Var':
       return {
         type,
+        id: uuidv4(),
         children: ['']
       };
     case 'Category':
       return {
         name: '',
         type,
+        id: uuidv4(),
         children: []
       }
     // case 'List':
@@ -112,6 +66,7 @@ const createBlockNode = (type: BlockType): BlockNode => {
     default:
       return {
         type,
+        id: uuidv4(),
         children: []
       }
   }
@@ -136,7 +91,7 @@ const addBlockNode = (obj: BlockNode | BlockNode[], path: string[], newBlockType
 }
 
 const reducer = (state: BlockNode | BlockNode[], action: BlockUpdateAction) => {
-  console.count("running reducer")
+  console.log("running reducer", action)
   if (action.type === 'sync') {
     return action.payload
   }
