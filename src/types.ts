@@ -22,7 +22,7 @@ export type BlockUpdateAction = {
   type: 'add',
   payload: {
     path: string,
-    blockType: BlockType,
+    blockNode: BlockNode,
   }
 } | {
   type: 'updateValue',
@@ -37,7 +37,7 @@ export type BlockUpdateAction = {
     callback: (n: BlockNode | BlockNode[]) => BlockNode | BlockNode[]
   }
 } | {
-  type: 'nodePath',
+  type: 'moveNode' | 'switchNode',
   payload: {
     from: string,
     to: string,

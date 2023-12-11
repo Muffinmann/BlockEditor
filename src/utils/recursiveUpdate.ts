@@ -29,35 +29,6 @@ export const buildBlockNodePath = (obj: BlockNode | BlockNode[], path: string, n
   return nodePath
 }
 
-export function switchNode(obj: BlockNode | BlockNode[], pathA: string, pathB: string) {
-  const nodePathA = buildBlockNodePath(obj, pathA)
-  const nodePathB = buildBlockNodePath(obj, pathB)
-
-  const nodeA = nodePathA[nodePathA.length - 1]
-  const nodeB = nodePathB[nodePathB.length - 1]
-
-  const parentA = nodePathA[nodePathA.length - 2]
-  const parentB = nodePathB[nodePathB.length - 2]
-
-  if (Object.is(parentA, parentB)) {
-    if (Array.isArray(parentA)) {
-      const indexA = Number(pathA.slice(pathA.lastIndexOf('.')))
-      const indexB = Number(pathB.slice(pathB.lastIndexOf('.')))
-      parentA[indexA] = nodeB
-      parentB[indexB] = nodeA
-      return
-    }
-  }
-
-  if (Array.isArray(parentA) && Array.isArray(parentB)) {
-    const indexA = Number(pathA.slice(pathA.lastIndexOf('.')))
-    const indexB = Number(pathB.slice(pathB.lastIndexOf('.')))
-    parentA[indexA] = nodeB
-    parentB[indexB] = nodeA
-    return
-  }
-}
-
 const recursiveUpdate = (obj: BlockNode | BlockNode[], path: string[], onReachTarget: (t: BlockNode | BlockNode[]) => BlockNode | BlockNode[] | null): null | BlockNode | BlockNode[] | BlockNode[keyof BlockNode] => {
   if (!path) {
     console.error("Expected 'path' argument to be type 'string[]', got 'undefined'.")

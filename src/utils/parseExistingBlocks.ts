@@ -1,15 +1,3 @@
-// const isBlockNode = (obj: unknown): obj is BlockNode => {
-//   if (obj === null) {
-//     return true
-//   }
-//   if (Array.isArray(obj) && obj.length) {
-//     return obj.every((o) => isBlockNode(o))
-//   }
-//   if (typeof obj === 'object' && Object.keys(obj).length === 1) {
-//     return true
-//   }
-//   return false
-// }
 
 import { BlockNode } from "../types";
 import uuidv4 from "./uuid";
@@ -95,7 +83,7 @@ const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
       return {
         id: uuidv4(),
         type: 'List',
-        children: input
+        children: input as BlockNode[]
       }
     }
 

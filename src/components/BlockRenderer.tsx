@@ -5,6 +5,49 @@ import BasicBlock from "./BasicBlock"
 import CategoryBlock from "./CategoryBlock"
 import Input from "./Input"
 import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
+import uuidv4 from "../utils/uuid"
+
+
+const createBlockNode = (type: BlockType): BlockNode => {
+  switch (type) {
+  case 'Text':
+    return '';
+
+  case 'Number':
+    return NaN;
+  case 'Boolean':
+    return false;
+  case 'Var':
+    return {
+      type,
+      id: uuidv4(),
+      children: ['']
+    };
+  case 'Category':
+    return {
+      name: '',
+      type,
+      id: uuidv4(),
+      children: []
+    }
+    // case 'List':
+    //   return {
+    //     type,
+    //     value: []
+    //   }
+    // case 'Boolean':
+    //   return {
+    //     type,
+    //     value: '',
+    //   }
+  default:
+    return {
+      type,
+      id: uuidv4(),
+      children: []
+    }
+  }
+}
 
 const ArrayBlock = ({nodes, path}: {nodes: BlockNode[], path: string}) => {
   return nodes.map((n, i) => (
@@ -68,7 +111,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
       type: 'add',
       payload: {
         path,
-        blockType: type
+        blockNode: createBlockNode(type)
       }
     })
   }
@@ -126,7 +169,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
       return;
     }
     dispatch({
-      type: 'nodePath',
+      type: ev.ctrlKey ? 'switchNode' : 'moveNode',
       payload: {
         from: fromPath,
         fromId,
