@@ -1,0 +1,22 @@
+.toolbar {
+  display: flex;
+  justify-content: start;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.toolbar-item {
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.icon {
+  /* Add styles for icons, e.g., using react-icons */
+  margin-right: 5px;
+}

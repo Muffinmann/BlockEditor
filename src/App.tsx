@@ -7,9 +7,10 @@ import testJSON from './config/test.json';
 import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
+import Toolbar from './components/Toolbar'
 
 
-const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[]) => {
+const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
   return recursiveUpdate(obj, path, () => {
     return value
   }) 
@@ -69,8 +70,8 @@ const switchBlockNode = (obj: BlockNode | BlockNode[], {from, to, fromId, toId}:
       return obj
     }
 
-    const updated = recursiveUpdate(obj, from.split('.'), () => toNode)
-    return recursiveUpdate(updated, to.split('.'), () => fromNode)
+    const updated = updateBlockNode(obj, from.split('.'), toNode)
+    return updateBlockNode(updated, to.split('.'), fromNode)
   }
   return obj
 }
@@ -135,6 +136,7 @@ function App() {
 
   return (
     <main>
+      {/* <Toolbar /> */}
       <BlockDispatcherProvider dispatch={dispatch}>
         <BlockRenderer path='root' node={tree} />
       </BlockDispatcherProvider>
