@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react'
+import { ChangeEvent, useEffect, useReducer } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockUpdateAction } from './types'
 import './App.css'
@@ -133,10 +133,67 @@ function App() {
     }
   }, [tree])
 
+  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const fr = new FileReader()
+      fr.readAsText(file, 'utf-8')
+      fr.onload = (e) => {
+        console.log("loaded", e)
+        if (e.target?.result){
+          dispatch({
+            type: 'sync',
+            payload: parseExistingBlocks(
+              JSON.parse(e.target.result as string)
+            ) as BlockNode
+          })
+        }
+      }
+      console.log(file, file.type)
+    }
+  }
+  type CommonPrimitive = string | number | boolean | null | undefined
+  const isPrimitive = (v: unknown): v is CommonPrimitive => v === null || (typeof v !== 'object' && typeof v !== 'function')
+  const transformTree = (node: BlockNode | BlockNode[], parent?: BlockNode) => {
+    if (Array.isArray(node)) {
+      if (node.length === 1 && isPrimitive(node[0])) {
+        return node[0]
+      }
+      if (node.some((n) => n !== null && typeof n === 'object' && n.type === 'Category')) {
+        return node.reduce((acc, crr) => {
+          if (crr) {
+            acc[crr.name] = transformTree(crr.children)
+          }
+          return acc
+        }, {}) 
+
+        
+      }
+      return node.map(transformTree)
+    }
+    if (node !== null && typeof node === 'object') {
+      if (node.type === 'Category') {
+        return {
+          [node.name]: transformTree(node.children, node)
+        }
+      }
+      if (node.type === 'List') {
+        return node.children
+      }
+      return {
+        [node.type]: transformTree(node.children)
+      }
+    }
+    return node
+  }
+  const handleDownload = () => {
+    console.log(transformTree(tree))
+  }
+
 
   return (
     <main>
-      {/* <Toolbar /> */}
+      <Toolbar onUpload={handleUpload} onDownload={handleDownload} />
       <BlockDispatcherProvider dispatch={dispatch}>
         <BlockRenderer path='root' node={tree} />
       </BlockDispatcherProvider>

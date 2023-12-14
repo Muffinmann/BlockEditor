@@ -65,7 +65,7 @@ const CategoryBlock = ({
 
   return (
     <BasicBlock 
-      defaultExpanded
+      defaultExpanded={false}
       displayName={<CategoryHeader name={displayName} onNameChange={onNameChange} />}
       onAdd={onAdd}
       onRemove={onRemove}
