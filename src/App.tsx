@@ -152,8 +152,6 @@ function App() {
       console.log(file, file.type)
     }
   }
-  type CommonPrimitive = string | number | boolean | null | undefined
-  const isPrimitive = (v: unknown): v is CommonPrimitive => v === null || (typeof v !== 'object' && typeof v !== 'function')
   const transformTree = (node: BlockNode | BlockNode[], parent?: BlockNode) => {
     if (Array.isArray(node)) {
       if (node.length === 1 && isPrimitive(node[0])) {

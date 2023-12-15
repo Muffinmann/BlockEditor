@@ -62,12 +62,16 @@
     "blockHeader": "Smaller Than (<)"
   },
   {
-    "type": "Formular"
+    "type": "Formula",
+    "blockHeader": "Formula"
   },
   {
     "type": "Text"
   },
-  {"type": "Number"},
-  {"type": "Boolean"}
-
+  {
+    "type": "Number"
+  },
+  {
+    "type": "Boolean"
+  }
 ]

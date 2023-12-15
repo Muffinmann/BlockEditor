@@ -7,7 +7,7 @@ export type BlockNode = {
   children: BlockNode[]
 } | {
   id: string,
-  type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan' | 'Every' | 'Some' | 'Var' | 'Formular' | 'Boolean' | 'List' | 'Not',
+  type: 'If' | 'StrictEqual' | 'NotEqual' | 'NotNull' | 'And' | 'Or' | 'GreaterThan' | 'SmallerThan' | 'Every' | 'Some' | 'Var' | 'Formula' | 'Boolean' | 'List' | 'Not',
   children: BlockNode[]
 }
   | string | null | number | boolean
@@ -50,3 +50,4 @@ export type BlockUpdateAction = {
 }
 
 export type BlockElement = string | null | undefined | JSX.Element | JSX.Element[]
+export type CommonPrimitive = string | number | boolean | null | undefined

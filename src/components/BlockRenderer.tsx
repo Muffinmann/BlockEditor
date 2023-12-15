@@ -208,6 +208,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
       </BasicBlock>
     )
   }
+
   const blockDef = BLOCK_DEFINITIONS.find((def) => def.type === node.type)
   if (!blockDef) {
     return null
