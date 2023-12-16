@@ -74,12 +74,19 @@ export const parseArithmetic = (input: any) => {
   }
   // const transformed = transform(input)
 
-  const unpack = (node: any) => {
+  const unpack = (node: any, parent = null) => {
     if (typeof node === 'object' && "sign" in node) {
-      return `${unpack(node.left)} ${node.sign} ${unpack(node.right)}` 
+      if (parent !== null 
+        && typeof parent === 'object'
+        && (parent.sign === '*' || parent.sign === '/')
+        && (node.sign === '+' || node.sign === '-')) {
+        return `(${unpack(node.left, node)} ${node.sign} ${unpack(node.right, node)})` 
+      }
+      return `${unpack(node.left, node)} ${node.sign} ${unpack(node.right, node)}` 
     }
     return node
   }
+  
   return unpack(transform(input))
 }
 

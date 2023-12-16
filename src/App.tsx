@@ -8,6 +8,7 @@ import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
 import Toolbar from './components/Toolbar'
+import isPrimitive from './utils/isPrimitive'
 
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
@@ -152,6 +153,7 @@ function App() {
       console.log(file, file.type)
     }
   }
+
   const transformTree = (node: BlockNode | BlockNode[], parent?: BlockNode) => {
     if (Array.isArray(node)) {
       if (node.length === 1 && isPrimitive(node[0])) {
