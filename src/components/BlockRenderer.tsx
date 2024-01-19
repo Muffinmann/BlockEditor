@@ -133,7 +133,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
     dispatch({
       type: 'updateValue',
       payload: {
-        path,
+        path: `${path}.children`,
         nextValue: value
       }
     })
