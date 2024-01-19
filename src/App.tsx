@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useReducer } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
-import { BlockNode, BlockUpdateAction } from './types'
+import { BlockNode, BlockUpdateAction, CommonPrimitive } from './types'
 import './App.css'
 import BlockRenderer from './components/BlockRenderer'
 import testJSON from './config/test.json';
@@ -8,7 +8,7 @@ import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
 import Toolbar from './components/Toolbar'
-import isPrimitive from './utils/isPrimitive'
+import parse from 'arithmetic2json'
 
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
@@ -154,28 +154,34 @@ function App() {
     }
   }
 
-  const transformTree = (node: BlockNode | BlockNode[], parent?: BlockNode) => {
+  const transformTree = (node: BlockNode | BlockNode[]): Record<string, any> | CommonPrimitive => {
     if (Array.isArray(node)) {
-      if (node.length === 1 && isPrimitive(node[0])) {
-        return node[0]
-      }
-      if (node.some((n) => n !== null && typeof n === 'object' && n.type === 'Category')) {
-        return node.reduce((acc, crr) => {
-          if (crr) {
-            acc[crr.name] = transformTree(crr.children)
-          }
-          return acc
-        }, {}) 
-
-        
-      }
-      return node.map(transformTree)
+      const nonNullNodes = node.filter((n) => n !== null)
+      return nonNullNodes.map(transformTree)
     }
+
     if (node !== null && typeof node === 'object') {
       if (node.type === 'Category') {
-        return {
-          [node.name]: transformTree(node.children, node)
+        const transformedChildren = transformTree(node.children)
+        console.log(node, "children", transformedChildren)
+        if (Array.isArray(transformedChildren) 
+            && transformedChildren.every((child) => child !== null && typeof child === 'object')){
+          return {
+            [node.name] :transformedChildren.reduce((prev: object, crr: object) => {
+              return {
+                ...prev,
+                ...crr
+              }
+            }, {}) as Record<string, any> }
         }
+        return {
+          [node.name]: transformedChildren
+        }
+      }
+      if (node.type === 'Formula') {
+        console.log("Parsing Formula", node)
+        const content = node.children[0] as string
+        return (content ? parse(content) : '') as Record<string, any>
       }
       if (node.type === 'List') {
         return node.children
@@ -186,8 +192,11 @@ function App() {
     }
     return node
   }
+
   const handleDownload = () => {
-    console.log(transformTree(tree))
+
+    console.log('start transform', tree)
+    console.log('transform result:', transformTree(tree))
   }
 
 

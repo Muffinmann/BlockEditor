@@ -17,6 +17,7 @@ const createBlockNode = (type: BlockType): BlockNode => {
     return NaN;
   case 'Boolean':
     return false;
+  case 'Formula':
   case 'Var':
     return {
       type,

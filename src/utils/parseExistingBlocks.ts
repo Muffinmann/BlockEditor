@@ -1,6 +1,5 @@
-
+import parse from "arithmetic2json";
 import { BlockNode } from "../types";
-import isPrimitive from "./isPrimitive";
 import uuidv4 from "./uuid";
 
 const AVAILABLE_OPERATORS = {
@@ -50,46 +49,6 @@ export const isLogic = (val: unknown): val is Logic => (typeof val === 'object'
   && Object.keys(val).length === 1)
   && hasAvailableOperator(Object.keys(val)[0]);
 
-export const parseArithmetic = (input: any) => {
-  const transform = (node: any) => {
-
-    if (isPrimitive(node)) {
-      return node
-    }
-
-    if (typeof node === 'object' ) {
-      if ('var' in node) {
-        return node.var
-      }
-
-    }
-    const sign = Object.keys(node)[0]
-    const operands = node[sign] 
-    console.log({node, sign, operands})
-    return {
-      sign,
-      left: transform(operands[0]),
-      right: transform(operands[1]),
-    }
-  }
-  // const transformed = transform(input)
-
-  const unpack = (node: any, parent = null) => {
-    if (typeof node === 'object' && "sign" in node) {
-      if (parent !== null 
-        && typeof parent === 'object'
-        && (parent.sign === '*' || parent.sign === '/')
-        && (node.sign === '+' || node.sign === '-')) {
-        return `(${unpack(node.left, node)} ${node.sign} ${unpack(node.right, node)})` 
-      }
-      return `${unpack(node.left, node)} ${node.sign} ${unpack(node.right, node)}` 
-    }
-    return node
-  }
-  
-  return unpack(transform(input))
-}
-
 const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
   // console.log({ input, type: typeof input })
   if (input === undefined || input === null || Number.isNaN(input)) {
@@ -117,14 +76,15 @@ const parseExistingBlocks = (input: unknown): BlockNode | BlockNode[] => {
     return {
       id: uuidv4(),
       type: "Formula",
-      children: [parseArithmetic(input)]
+      children: [parse(input) as string]
     }
   }
 
 
 
   if (Array.isArray(input)) {
-    if (input.length > 1 && input.every((i) => typeof i === 'string')) {
+    if (input.length > 1 
+      && (input.every((i) => typeof i === 'string') || input.every((i) => typeof i === 'number'))) {
       return {
         id: uuidv4(),
         type: 'List',
