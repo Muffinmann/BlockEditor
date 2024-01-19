@@ -157,13 +157,12 @@ function App() {
   const transformTree = (node: BlockNode | BlockNode[]): Record<string, any> | CommonPrimitive => {
     if (Array.isArray(node)) {
       const nonNullNodes = node.filter((n) => n !== null)
-      return nonNullNodes.map(transformTree)
+      return nonNullNodes.flatMap(transformTree) as (Record<string, any> | CommonPrimitive)[]
     }
 
     if (node !== null && typeof node === 'object') {
       if (node.type === 'Category') {
         const transformedChildren = transformTree(node.children)
-        console.log(node, "children", transformedChildren)
         if (Array.isArray(transformedChildren) 
             && transformedChildren.every((child) => child !== null && typeof child === 'object')){
           return {
