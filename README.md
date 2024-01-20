@@ -7,6 +7,6 @@ edit logic with blocks
 # TODOs
 - [x] Draggable
 - [x] Parse existing blocks
-- [ ] Download
+- [x] Download
 - [ ] Shortcut for formulas
 - [ ] Variable key intellisense
