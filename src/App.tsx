@@ -198,8 +198,6 @@ function App() {
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)])) 
     a.setAttribute('download', 'data.json')
     a.click()
-    console.log('start transform', tree)
-    console.log('transform result:', transformTree(tree))
   }
 
 
