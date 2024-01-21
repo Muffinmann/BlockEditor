@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useReducer, useState } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockUpdateAction, CommonPrimitive } from './types'
 import './App.css'
-import BlockRenderer, { createBlockNode } from './components/BlockRenderer'
+import BlockRenderer from './components/BlockRenderer'
 import testJSON from './config/test.json';
 import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
@@ -10,6 +10,8 @@ import blockNodeIsObject from './utils/blockNodeIsObject'
 import Toolbar from './components/Toolbar'
 import parse from 'arithmetic2json'
 import PopupSelect from './components/PopupSelect'
+import createBlockNode from './utils/createBlockNode'
+import isPrimitive from './utils/isPrimitive'
 
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
@@ -18,9 +20,12 @@ const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: st
   }) 
 }
 
-const removeBlockNode = (obj: BlockNode | BlockNode[], path: string[], id: string) => {
+const removeBlockNode = (obj: BlockNode | BlockNode[], path: string[], id?: string) => {
   return recursiveUpdate(obj, path, (node) => {
     if (blockNodeIsObject(node) && (node.id === id)) {
+      return null
+    }
+    if (isPrimitive(node)) {
       return null
     }
     return node
@@ -33,7 +38,7 @@ const addBlockNode = (obj: BlockNode | BlockNode[], path: string[], newBlockNode
       return [...obj, newBlockNode].filter((n) => n !== null)
     }
     if (blockNodeIsObject(obj)) {
-      const children = obj.children.filter((c) => c !== undefined || c !== null)
+      const children = obj.children.filter((c) => (c !== undefined && c !== null))
 
       const nodeIsDuplicated = children.findIndex((c) => blockNodeIsObject(c) && blockNodeIsObject(newBlockNode) && c.id === newBlockNode.id) > -1
       if (nodeIsDuplicated) {

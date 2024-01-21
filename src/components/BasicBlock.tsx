@@ -155,7 +155,7 @@ const BasicBlock = ({
           </button>)
         }
         {!disableRemove && (
-          <button className="remove-btn" onClick={onRemove}>-</button>
+          <button className="remove-btn" onClick={() => onRemove?.()}>-</button>
         )}
         {showPopup && <PopupSelect onClick={(blockType) => onAdd && onAdd(blockType)} />}
       </div>

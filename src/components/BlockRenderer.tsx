@@ -5,50 +5,8 @@ import BasicBlock from "./BasicBlock"
 import CategoryBlock from "./CategoryBlock"
 import Input from "./Input"
 import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
-import uuidv4 from "../utils/uuid"
+import createBlockNode from "../utils/createBlockNode"
 
-
-export const createBlockNode = (type: BlockType): BlockNode => {
-  switch (type) {
-  case 'Text':
-    return '';
-
-  case 'Number':
-    return NaN;
-  case 'Boolean':
-    return false;
-  case 'Formula':
-  case 'Var':
-    return {
-      type,
-      id: uuidv4(),
-      children: ['']
-    };
-  case 'Category':
-    return {
-      name: '',
-      type,
-      id: uuidv4(),
-      children: []
-    }
-    // case 'List':
-    //   return {
-    //     type,
-    //     value: []
-    //   }
-    // case 'Boolean':
-    //   return {
-    //     type,
-    //     value: '',
-    //   }
-  default:
-    return {
-      type,
-      id: uuidv4(),
-      children: []
-    }
-  }
-}
 
 const ArrayBlock = ({nodes, path}: {nodes: BlockNode[], path: string}) => {
   return nodes.map((n, i) => (
@@ -75,32 +33,28 @@ const PrimitiveBlock = ({node, path}: {node: string | number | boolean, path: st
     })
   }
 
-
   if (typeof node === 'string') {
-    return (
-      <Input value={node} onChange={handleValueChange} placeholder="Enter text" />
-    )
+    return <Input value={node} onChange={handleValueChange} placeholder="Enter text" />
   }
   if (typeof node === 'number') {
-    return (
-      <Input type="number" value={node} onChange={handleValueChange} placeholder="Enter number" />
-    )
+    return <Input type="number" value={node} onChange={handleValueChange} placeholder="Enter number" />
   }
 
   if (typeof node === 'boolean') {
     return (
       <div>
         <label>
-          true
+            true
           <Input type="radio" value="true" checked={node} onChange={handleValueChange} />
         </label>
         <label>
-          false
+            false
           <Input type="radio" value="false" checked={!node} onChange={handleValueChange} />
         </label>
       </div>
     )
   }
+ 
   return null;
 }
 
@@ -117,11 +71,11 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
     })
   }
 
-  const handleRemove = () => {
+  const handleRemove = (p?: string) => {
     dispatch({
       type: 'remove',
       payload: {
-        path,
+        path: p || path,
         id: node.id,
       },
     })
@@ -193,11 +147,19 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
   if (node.type === 'If') {
     return (
       <BasicBlock onAdd={handleAdd} onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
-        {node.children.slice(0, 3).map((child, i) => (
-          <BasicBlock key={i} disableAdd disableRemove disableDrag allowDragPropagation displayName={i === 0 ? "Evaluation" : i % 2 === 1 ? "Truthy" : "Falsy"} className={i === 0 ? "evaluation-block" : i === 1 ? "truthy-block" : "falsy-block"}>
+        {node.children.slice(0, 3).map((child, i) => child !== null ? (
+          <BasicBlock
+            key={i} 
+            disableAdd 
+            disableDrag 
+            allowDragPropagation 
+            onRemove={() => handleRemove(`${path}.children.${i}`)}
+            displayName={i === 0 ? "Evaluation" : i % 2 === 1 ? "Truthy" : "Falsy"}
+            className={i === 0 ? "evaluation-block" : i === 1 ? "truthy-block" : "falsy-block"}
+          >
             <BlockRenderer node={child} path={`${path}.children.${i}`} />
           </BasicBlock>
-        ))}
+        ): <div key={i} />)}
       </BasicBlock>
     )
   }
@@ -233,7 +195,7 @@ export const BlockRenderer = ({ node, path = 'root' }: { node: BlockNode | Block
     return <PrimitiveBlock node={node} path={path} />
   }
 
-  return < RecursiveBlock node={node} path={path} />
+  return <RecursiveBlock node={node} path={path} />
 
  
 }
