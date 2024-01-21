@@ -1,14 +1,15 @@
-import { ChangeEvent, useEffect, useReducer } from 'react'
+import { ChangeEvent, useEffect, useReducer, useState } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockUpdateAction, CommonPrimitive } from './types'
 import './App.css'
-import BlockRenderer from './components/BlockRenderer'
+import BlockRenderer, { createBlockNode } from './components/BlockRenderer'
 import testJSON from './config/test.json';
 import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
 import Toolbar from './components/Toolbar'
 import parse from 'arithmetic2json'
+import PopupSelect from './components/PopupSelect'
 
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
@@ -28,6 +29,9 @@ const removeBlockNode = (obj: BlockNode | BlockNode[], path: string[], id: strin
 
 const addBlockNode = (obj: BlockNode | BlockNode[], path: string[], newBlockNode: BlockNode) => {
   return recursiveUpdate(obj, path, (obj) => {
+    if (Array.isArray(obj)) {
+      return [...obj, newBlockNode].filter((n) => n !== null)
+    }
     if (blockNodeIsObject(obj)) {
       const children = obj.children.filter((c) => c !== undefined || c !== null)
 
@@ -201,12 +205,25 @@ function App() {
   }
 
 
+  const [showPopup, setShowPopup] = useState(false)
   return (
     <main>
       <Toolbar onUpload={handleUpload} onDownload={handleDownload} />
       <BlockDispatcherProvider dispatch={dispatch}>
         <BlockRenderer path='root' node={tree} />
       </BlockDispatcherProvider>
+      <div style={{position: 'relative'}}>
+        <button className='add-btn' onClick={() => setShowPopup((old) => !old)}>
+        +
+        </button>
+        {showPopup && <PopupSelect onClick={(blockType) => {dispatch({
+          type: 'add',
+          payload: {
+            path: 'root',
+            blockNode: createBlockNode(blockType) 
+          }
+        })}} />}
+      </div>
     </main>
   )
 }

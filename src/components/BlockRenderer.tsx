@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEventHandler, useId } from "react"
+import { ChangeEvent, DragEventHandler } from "react"
 import { useBlockDispatcher } from "../hooks/useBlockDispatcher"
 import { BlockNode, BlockType } from "../types"
 import BasicBlock from "./BasicBlock"
@@ -8,7 +8,7 @@ import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
 import uuidv4 from "../utils/uuid"
 
 
-const createBlockNode = (type: BlockType): BlockNode => {
+export const createBlockNode = (type: BlockType): BlockNode => {
   switch (type) {
   case 'Text':
     return '';
