@@ -1,0 +1,13 @@
+main {
+  display: flex;
+  place-content: center;
+  position: relative;
+}
+
+.hidden {
+  display: none;
+}
+
+.relative {
+  position: relative;
+}

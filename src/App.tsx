@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useReducer, useState } from 'react'
+import { ChangeEvent, useEffect, useReducer } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
-import { BlockNode, BlockUpdateAction } from './types'
+import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
 import BlockRenderer from './components/BlockRenderer'
 import testJSON from './config/test.json';
@@ -8,7 +8,6 @@ import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
 import Toolbar from './components/Toolbar'
-import PopupSelect from './components/PopupSelect'
 import createBlockNode from './utils/createBlockNode'
 import isPrimitive from './utils/isPrimitive'
 import transformTree from './utils/transformTree'
@@ -172,25 +171,29 @@ function App() {
   }
 
 
-  const [showPopup, setShowPopup] = useState(false)
+  const handleAddBlock = (type: BlockType) => {
+    dispatch({
+      type: 'add',
+      payload: {
+        path: 'root',
+        blockNode: createBlockNode(type)
+      }
+    })
+  }
   return (
     <main>
-      <Toolbar onUpload={handleUpload} onDownload={handleDownload} />
+      <div className='relative'>
+        <Toolbar 
+          onUpload={handleUpload}
+          onDownload={handleDownload} 
+          onAddBlock={handleAddBlock}
+        />
+        
+      </div>
       <BlockDispatcherProvider dispatch={dispatch}>
         <BlockRenderer path='root' node={tree} />
       </BlockDispatcherProvider>
-      <div style={{position: 'relative'}}>
-        <button className='add-btn' onClick={() => setShowPopup((old) => !old)}>
-        +
-        </button>
-        {showPopup && <PopupSelect onClick={(blockType) => {dispatch({
-          type: 'add',
-          payload: {
-            path: 'root',
-            blockNode: createBlockNode(blockType) 
-          }
-        })}} />}
-      </div>
+      
     </main>
   )
 }
