@@ -1,8 +1,10 @@
 .toolbar {
+  position: sticky;
+  top: 10px;
   display: flex;
+  flex-direction: column;
   justify-content: start;
   padding: 10px;
-  border-bottom: 1px solid #ddd;
 }
 
 .toolbar-item {
@@ -17,6 +19,5 @@
 }
 
 .icon {
-  /* Add styles for icons, e.g., using react-icons */
   margin-right: 5px;
 }

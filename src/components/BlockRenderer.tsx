@@ -147,14 +147,14 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
   if (node.type === 'If') {
     return (
       <BasicBlock onAdd={handleAdd} onRemove={handleRemove} displayName="If" onDragStart={handleDragStart} onDrop={handleDrop}>
-        {node.children.slice(0, 3).map((child, i) => child !== null ? (
+        {node.children.map((child, i) => child !== null ? (
           <BasicBlock
             key={i} 
             disableAdd 
             disableDrag 
             allowDragPropagation 
             onRemove={() => handleRemove(`${path}.children.${i}`)}
-            displayName={i === 0 ? "Evaluation" : i % 2 === 1 ? "Truthy" : "Falsy"}
+            displayName={i === 0 ? "Evaluation" : i % 2 === 1 ? "Then" : "Else"}
             className={i === 0 ? "evaluation-block" : i === 1 ? "truthy-block" : "falsy-block"}
           >
             <BlockRenderer node={child} path={`${path}.children.${i}`} />

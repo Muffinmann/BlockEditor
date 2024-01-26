@@ -133,18 +133,10 @@ const BasicBlock = ({
       onDrop={handleDrop} 
     >
      
-      <div className="block-header">
-        {displayName}
-        {hovered && (
-          <button type="button" onClick={() => {setExpanded((old) => !old)}} className="expand-btn">
-            {expanded ? <FiMinimize2 /> :<FiMaximize2 />}
-          </button>
-        )}
-      </div>
-      <div className="block-content">
-        {expanded ? children : '...'}
-      </div>
       <div className={`block-footer ${hovered ? '' : 'hidden'}`}>
+        {!disableRemove && (
+          <button className="remove-btn" onClick={() => onRemove?.()}>-</button>
+        )}
         {!disableAdd && (
           <button
             name="addButton"
@@ -154,10 +146,21 @@ const BasicBlock = ({
             +
           </button>)
         }
-        {!disableRemove && (
-          <button className="remove-btn" onClick={() => onRemove?.()}>-</button>
-        )}
         {showPopup && <PopupSelect onClick={(blockType) => onAdd && onAdd(blockType)} />}
+      </div>
+      <div className="block-header">
+        {displayName}
+        {hovered && (
+          <button type="button" onClick={() => {setExpanded((old) => !old)}} className="expand-btn">
+            {expanded ? <FiMinimize2 /> :<FiMaximize2 />}
+          </button>
+        )}
+      </div>
+      <div className="block-content">
+        {expanded ? children : (
+          <button type="button" className="expand-btn" onClick={() => setExpanded(true)}>
+            ......
+          </button>)}
       </div>
     </div>
   )
