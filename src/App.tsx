@@ -3,7 +3,6 @@ import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
 import BlockRenderer from './components/BlockRenderer'
-import testJSON from './config/test.json';
 import parseExistingBlocks from './utils/parseExistingBlocks'
 import recursiveUpdate, { buildBlockNodePath } from './utils/recursiveUpdate'
 import blockNodeIsObject from './utils/blockNodeIsObject'
@@ -116,7 +115,7 @@ const reducer = (state: BlockNode | BlockNode[], action: BlockUpdateAction) => {
 export const KeywordsContext = createContext(createTrie())
 
 function App() {
-  const [tree, dispatch] = useReducer(reducer, parseExistingBlocks(testJSON), (arg) => {
+  const [tree, dispatch] = useReducer(reducer, null, (arg) => {
     const currentData = localStorage.getItem('block-data')
     if (currentData) {
       return JSON.parse(currentData) as BlockNode
@@ -232,10 +231,11 @@ function App() {
           />
         
         </div>
-        <BlockDispatcherProvider dispatch={dispatch}>
-          <BlockRenderer path='root' node={tree} />
-        </BlockDispatcherProvider>
-      
+        <div className='block-editor'>
+          <BlockDispatcherProvider dispatch={dispatch}>
+            <BlockRenderer path='root' node={tree} />
+          </BlockDispatcherProvider>
+        </div>
       </main>
     </KeywordsContext.Provider>
   )
