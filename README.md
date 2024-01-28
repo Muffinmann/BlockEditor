@@ -8,5 +8,5 @@ edit logic with blocks
 - [x] Draggable
 - [x] Parse existing blocks
 - [x] Download
-- [ ] Shortcut for formulas
+- [x] Shortcut for formulas
 - [ ] Variable key intellisense
