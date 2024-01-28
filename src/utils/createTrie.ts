@@ -3,7 +3,7 @@ type Trie = {
 }
 
 const createTrie = () => {
-  const trie: Trie = {}
+  let trie: Trie = {}
   return {
     add(input: string){
       let current = trie
@@ -54,6 +54,12 @@ const createTrie = () => {
         return recursiveSearch(target) 
       }
       return []
+    },
+    restore(savedTrie: Trie){
+      trie = savedTrie 
+    },
+    getRoot() {
+      return trie
     }
   }
 }

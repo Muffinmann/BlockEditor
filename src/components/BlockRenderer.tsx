@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEventHandler } from "react"
+import { ChangeEvent, DragEventHandler, createContext, useContext, useState } from "react"
 import { useBlockDispatcher } from "../hooks/useBlockDispatcher"
 import { BlockNode, BlockType } from "../types"
 import BasicBlock from "./BasicBlock"
@@ -6,7 +6,45 @@ import CategoryBlock from "./CategoryBlock"
 import Input from "./Input"
 import BLOCK_DEFINITIONS from '../config/blockDefinitions.json'
 import createBlockNode from "../utils/createBlockNode"
+import { KeywordsContext } from "../App"
+import PopupList from "./PopupList"
 
+
+const KeyInput = ({node, path}: {node: string, path: string}) => {
+  const [localValue = node, setLocalValue] = useState<string | undefined>();
+  const [isFocused, setIsFocused] = useState(false)
+  const dispatch = useBlockDispatcher() 
+  const keywordsTrie = useContext(KeywordsContext)
+ 
+  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setLocalValue(val)
+  }
+  
+  const handleValueChange = (value: string) => {
+    dispatch({
+      type: 'updateValue',
+      payload: {
+        path,
+        nextValue: value
+      }
+    })
+    setIsFocused(false)
+    setLocalValue(value)
+  }
+
+  const possibleKeys = keywordsTrie.search(localValue || '') as string[]
+
+  return (
+    <div className="relative">
+      <Input value={localValue} onFocus={() => setIsFocused(true)}  onChange={handleLocalChange} placeholder="Enter text" />
+      {
+        localValue?.length && isFocused
+          ? <PopupList onClick={handleValueChange} options={possibleKeys.map((k) => ({displayName: k, value: k}))} />
+          : null
+      }
+    </div>)
+}
 
 const ArrayBlock = ({nodes, path}: {nodes: BlockNode[], path: string}) => {
   return nodes.map((n, i) => (
@@ -134,7 +172,14 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
     })
     console.log(`MOVE FROM [${fromPath}#${fromId}] TO [${path}#${node.id}]`)
   }
-  
+ 
+  if (node.type === 'Var') {
+    return (
+      <BasicBlock displayName="Var">
+        <KeyInput node={node.children[0] as string } path={`${path}.children.0`} />
+      </BasicBlock>
+    )
+  }
 
   if (node.type === 'Category') {
     return (

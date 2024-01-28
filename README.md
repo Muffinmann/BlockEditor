@@ -9,4 +9,4 @@ edit logic with blocks
 - [x] Parse existing blocks
 - [x] Download
 - [x] Shortcut for formulas
-- [ ] Variable key intellisense
+- [x] Variable key intellisense

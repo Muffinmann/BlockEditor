@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useReducer } from 'react'
+import { ChangeEvent, createContext, useEffect, useReducer, useRef } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
@@ -11,6 +11,7 @@ import Toolbar from './components/Toolbar'
 import createBlockNode from './utils/createBlockNode'
 import isPrimitive from './utils/isPrimitive'
 import transformTree from './utils/transformTree'
+import createTrie from './utils/createTrie'
 
 
 const updateBlockNode = (obj: BlockNode | BlockNode[], path: string[], value: string | number | boolean | string[] | number[] | BlockNode) => {
@@ -112,6 +113,8 @@ const reducer = (state: BlockNode | BlockNode[], action: BlockUpdateAction) => {
   return state
 }
 
+export const KeywordsContext = createContext(createTrie())
+
 function App() {
   const [tree, dispatch] = useReducer(reducer, parseExistingBlocks(testJSON), (arg) => {
     const currentData = localStorage.getItem('block-data')
@@ -180,21 +183,61 @@ function App() {
       }
     })
   }
+  
+  const keywordsRef = useRef((() => {
+    const savedTrie = localStorage.getItem('keywordsTrie')
+    const trie = createTrie()
+    if (savedTrie) {
+      // lint bug
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      trie.restore(JSON.parse(savedTrie))
+    }
+    return trie
+  })())
+
+  const handleUploadKeywords = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const fr = new FileReader()
+      fr.readAsText(file, 'utf-8')
+      fr.onload = (e) => {
+        console.log("loaded", e)
+        if (e.target?.result){
+          const res = e.target.result
+          if (typeof res === 'string') {
+            const cleaned = res.replace(/\r\n/g, ',').split(',').filter((i) => i !== '')
+            console.log({res, cleaned})
+            const trie = createTrie()
+            for (const key of cleaned) {
+              trie.add(key)
+            }
+            localStorage.setItem('keywordsTrie', JSON.stringify(trie.getRoot()))
+            keywordsRef.current = trie
+          }
+        }
+      }
+      console.log(file, file.type)
+    }
+  }
+
   return (
-    <main>
-      <div className='relative'>
-        <Toolbar 
-          onUpload={handleUpload}
-          onDownload={handleDownload} 
-          onAddBlock={handleAddBlock}
-        />
+    <KeywordsContext.Provider value={keywordsRef.current}>
+      <main>
+        <div className='relative'>
+          <Toolbar 
+            onUpload={handleUpload}
+            onUploadKeywords={handleUploadKeywords}
+            onDownload={handleDownload} 
+            onAddBlock={handleAddBlock}
+          />
         
-      </div>
-      <BlockDispatcherProvider dispatch={dispatch}>
-        <BlockRenderer path='root' node={tree} />
-      </BlockDispatcherProvider>
+        </div>
+        <BlockDispatcherProvider dispatch={dispatch}>
+          <BlockRenderer path='root' node={tree} />
+        </BlockDispatcherProvider>
       
-    </main>
+      </main>
+    </KeywordsContext.Provider>
   )
 }
 
