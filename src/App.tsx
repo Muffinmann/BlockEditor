@@ -32,6 +32,9 @@ const removeBlockNode = (obj: BlockNode | BlockNode[], path: string[], id?: stri
 }
 
 const addBlockNode = (obj: BlockNode | BlockNode[], path: string[], newBlockNode: BlockNode) => {
+  if (obj === null) {
+    return newBlockNode
+  }
   return recursiveUpdate(obj, path, (obj) => {
     if (Array.isArray(obj)) {
       return [...obj, newBlockNode].filter((n) => n !== null)
