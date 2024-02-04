@@ -56,6 +56,12 @@ const transformTree = (node: BlockNode | BlockNode[]): Record<string, any> | Com
     if (node.type === 'List') {
       return node.children
     }
+    if (node.type === 'Var') {
+      if (node.children.length > 1) {
+        return {var: transformTree(node.children)}
+      }
+      return {var: node.children[0]}
+    }
 
     const name = OPERATOR_REMAP[node.type as keyof typeof OPERATOR_REMAP] || 'unknownOperator' 
     return {

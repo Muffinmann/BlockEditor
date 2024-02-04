@@ -11,14 +11,19 @@ import PopupList from "./PopupList"
 
 
 const KeyInput = ({node, path }: {node: string, path: string}) => {
-  const [localValue = node, setLocalValue] = useState<string | undefined>();
   const [isFocused, setIsFocused] = useState(false)
   const dispatch = useBlockDispatcher() 
   const keywordsTrie = useContext(KeywordsContext)
  
   const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
-    setLocalValue(val)
+    dispatch({
+      type: 'updateValue',
+      payload: {
+        path,
+        nextValue: val
+      }
+    })
   }
   
   const handleValueChange = (value: string) => {
@@ -30,16 +35,15 @@ const KeyInput = ({node, path }: {node: string, path: string}) => {
       }
     })
     setIsFocused(false)
-    setLocalValue(value)
   }
 
-  const possibleKeys = keywordsTrie.search(localValue || '') as string[]
+  const possibleKeys = keywordsTrie.search(node || '') as string[]
 
   return (
     <div className="relative">
-      <Input value={localValue} onFocus={() => setIsFocused(true)}  onChange={handleLocalChange} placeholder="Enter text" />
+      <Input value={node} onFocus={() => setIsFocused(true)}  onChange={handleLocalChange} placeholder="Enter text" />
       {
-        localValue?.length && isFocused
+        node?.length && isFocused
           ? <PopupList onClick={handleValueChange} options={possibleKeys.map((k) => ({displayName: k, value: k}))} />
           : null
       }
