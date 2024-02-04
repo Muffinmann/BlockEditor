@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, useEffect, useReducer, useRef } from 'react'
+import { ChangeEvent, createContext, useEffect, useReducer, useRef, useState } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
@@ -186,7 +186,7 @@ function App() {
     })
   }
   
-  const keywordsRef = useRef((() => {
+  const [keywordsRef, setKeywordsRef] = useState(() => {
     const savedTrie = localStorage.getItem('keywordsTrie')
     const trie = createTrie()
     if (savedTrie) {
@@ -195,7 +195,7 @@ function App() {
       trie.restore(JSON.parse(savedTrie))
     }
     return trie
-  })())
+  })
 
   const handleUploadKeywords = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -214,7 +214,7 @@ function App() {
               trie.add(key)
             }
             localStorage.setItem('keywordsTrie', JSON.stringify(trie.getRoot()))
-            keywordsRef.current = trie
+            setKeywordsRef(trie)
           }
         }
       }
@@ -223,7 +223,7 @@ function App() {
   }
 
   return (
-    <KeywordsContext.Provider value={keywordsRef.current}>
+    <KeywordsContext.Provider value={keywordsRef}>
       <main>
         <div className='relative'>
           <Toolbar 
