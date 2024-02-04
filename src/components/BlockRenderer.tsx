@@ -166,7 +166,11 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
       return;
     }
     dispatch({
-      type: ev.ctrlKey ? 'switchNode' : 'moveNode',
+      type: ev.ctrlKey 
+        ? 'switchNode' 
+        :  ev?.shiftKey 
+          ? 'copyNode' 
+          : 'moveNode',
       payload: {
         from: fromPath,
         fromId,
@@ -179,7 +183,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
  
   if (node.type === 'Var') {
     return (
-      <BasicBlock displayName="Var" onDragStart={handleDragStart} onDrop={handleDrop}>
+      <BasicBlock displayName="Var" onRemove={handleRemove} onDragStart={handleDragStart} onDrop={handleDrop} disableAdd>
         <KeyInput node={node.children[0] as string } path={`${path}.children.0`} />
       </BasicBlock>
     )

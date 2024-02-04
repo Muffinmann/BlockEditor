@@ -37,7 +37,7 @@ export type BlockUpdateAction = {
     callback: (n: BlockNode | BlockNode[]) => BlockNode | BlockNode[]
   }
 } | {
-  type: 'moveNode' | 'switchNode',
+  type: 'moveNode' | 'switchNode' | 'copyNode',
   payload: {
     from: string,
     to: string,

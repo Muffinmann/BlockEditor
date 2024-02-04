@@ -61,6 +61,11 @@ const addBlockNode = (obj: BlockNode | BlockNode[], path: string[], newBlockNode
 const moveBlockNode = (obj: BlockNode | BlockNode[], {from, to, fromId, toId}: (BlockUpdateAction & {type: 'moveNode'})['payload']) => {
   const fromNode = buildBlockNodePath(obj, from).pop()
   const toNode = buildBlockNodePath(obj, to).pop()
+
+  if (blockNodeIsObject(toNode) && toNode.type === 'Var') {
+    console.log("Moving not allowed: Var block cannot accept more children ")
+    return obj
+  }
   if (blockNodeIsObject(fromNode) && blockNodeIsObject(toNode)) {
     if (fromNode.id !== fromId || toNode.id !== toId) {
       console.log('Inconsistent update: node id does not match')
@@ -89,6 +94,16 @@ const switchBlockNode = (obj: BlockNode | BlockNode[], {from, to, fromId, toId}:
 }
 
 
+const copyBlockNode = (obj: BlockNode | BlockNode[], {from, to}: (BlockUpdateAction & {type: 'switchNode'})['payload']) => {
+  const fromNode = buildBlockNodePath(obj, from).pop()
+
+  if (blockNodeIsObject(fromNode)) {
+    return addBlockNode(obj, to.split('.'), fromNode)
+  }
+  return obj
+}
+
+
 const reducer = (state: BlockNode | BlockNode[], action: BlockUpdateAction) => {
   console.log("running reducer", action)
   if (action.type === 'sync') {
@@ -111,6 +126,9 @@ const reducer = (state: BlockNode | BlockNode[], action: BlockUpdateAction) => {
   }
   if (action.type === 'switchNode') {
     return switchBlockNode(state, action.payload)
+  }
+  if (action.type === 'copyNode') {
+    return copyBlockNode(state, action.payload)
   }
   return state
 }
