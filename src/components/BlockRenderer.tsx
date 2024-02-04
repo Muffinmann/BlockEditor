@@ -10,7 +10,7 @@ import { KeywordsContext } from "../App"
 import PopupList from "./PopupList"
 
 
-const KeyInput = ({node, path}: {node: string, path: string}) => {
+const KeyInput = ({node, path }: {node: string, path: string}) => {
   const [localValue = node, setLocalValue] = useState<string | undefined>();
   const [isFocused, setIsFocused] = useState(false)
   const dispatch = useBlockDispatcher() 
@@ -175,7 +175,7 @@ const RecursiveBlock = ({node, path}: {node: BlockNode & object, path: string}) 
  
   if (node.type === 'Var') {
     return (
-      <BasicBlock displayName="Var">
+      <BasicBlock displayName="Var" onDragStart={handleDragStart} onDrop={handleDrop}>
         <KeyInput node={node.children[0] as string } path={`${path}.children.0`} />
       </BasicBlock>
     )
