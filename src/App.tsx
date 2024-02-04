@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, useEffect, useReducer, useRef, useState } from 'react'
+import { ChangeEvent, createContext, useEffect, useReducer, useState } from 'react'
 import { BlockDispatcherProvider } from './hooks/useBlockDispatcher'
 import { BlockNode, BlockType, BlockUpdateAction } from './types'
 import './App.css'
